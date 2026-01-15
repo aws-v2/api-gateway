@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+api:
+  version: /api/v1
+
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: prod
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false  # Keep false since you're using manual routes
+          lower-case-service-id: false  # Add this to preserve case
+
+
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 5  # Add this for faster updates
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000
+
+data:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6370}
+
+nats:
+  url: ${NATS_URL:nats://localhost:4222}
+
+
+
+
+
+
+
+
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+
+
+
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
