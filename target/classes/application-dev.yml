@@ -1,0 +1,26 @@
+server:
+  port: ${SERVER_PORT:8087}
+
+spring:
+  data:
+    redis:
+      host: ${DEV_REDIS_HOST:localhost}
+      port: ${DEV_REDIS_PORT:6370}
+# Removed config server import
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DEV_EUREKA_URL:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 5
+
+nats:
+  url: ${DEV_NATS_URL:nats://localhost:4222}
+  username: ${DEV_NATS_USERNAME:auth-server}
+  password: ${DEV_NATS_PASSWORD:auth-secret}
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000

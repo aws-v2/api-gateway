@@ -1,0 +1,25 @@
+spring:
+  data:
+    redis:
+      host: ${PROD_REDIS_HOST:13.60.18.37}
+      port: ${PROD_REDIS_PORT:6370}
+# Removed config server import
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${PROD_EUREKA_URL:https://discovery-server-latest-6p1n.onrender.com/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 30
+  instance:
+    prefer-ip-address: true # Often needed in cloud environments
+
+nats:
+  url: ${PROD_NATS_URL}
+  username: ${PROD_NATS_USERNAME}
+  password: ${PROD_NATS_PASSWORD}
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000
