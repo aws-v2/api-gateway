@@ -28,3 +28,20 @@ jobs:
         tags: qarani/api-gateway:latest
         build-args: |
           SPRING_PROFILES_ACTIVE=prod
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        passphrase: ${{ secrets.EC2_SSH_PASSPHRASE }}
+        script: |
+          docker pull qarani/api-gateway:latest
+          docker stop api-gateway || true
+          docker rm api-gateway || true
+          docker run -d --name api-gateway --network mini-aws-network --env-file /home/runner/.api-gateway-prod.env -p 8080:8080 qarani/api-gateway:latest
