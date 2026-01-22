@@ -1,11 +1,11 @@
 server:
-  port: ${SERVER_PORT:8087}
+  port: ${SERVER_PORT:8080}
 
 spring:
   data:
     redis:
       host: ${DEV_REDIS_HOST:localhost}
-      port: ${DEV_REDIS_PORT:6370}
+      port: ${DEV_REDIS_PORT:6379}
 # Removed config server import
 
 eureka:

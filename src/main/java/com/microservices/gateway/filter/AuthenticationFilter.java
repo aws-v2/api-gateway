@@ -3,6 +3,7 @@ package com.microservices.gateway.filter;
 import com.microservices.gateway.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import com.microservices.gateway.util.JwtUtil;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -26,8 +27,18 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @Autowired
     private RedisService redisService;
 
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     // List of public endpoints that don't require auth
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/verify",
+            "/api/v1/auth/mfa/verify",
+            "/api/v1/auth/verify-email",
+            "/api/v1/auth/resend-verification",
+            "/api/v1/auth/reset-password",
+            "/api/v1/auth/forgot-password",
             "/auth/login",
             "/auth/register",
             "/auth/verify",
@@ -42,7 +53,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // 1. Allow public endpoints
+        log.info("Processing request for path: {}", path);
         if (isPublicEndpoint(path)) {
+            log.info("Path {} is public, bypassing auth", path);
             return chain.filter(exchange);
         }
 
@@ -101,7 +114,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(String path) {
-        return PUBLIC_ENDPOINTS.stream().anyMatch(path::startsWith);
+        return PUBLIC_ENDPOINTS.stream()
+                .anyMatch(publicPath -> pathMatcher.match(publicPath, path));
     }
 
     @Override
