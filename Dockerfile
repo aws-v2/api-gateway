@@ -30,8 +30,9 @@ RUN addgroup -g 1001 -S appgroup && \
 # Set working directory
 WORKDIR /app
 
-# Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy JAR from build stage (ensure we get the executable JAR, not the .original one)
+COPY --from=build /app/target/api-gateway-*.jar app.jar
+RUN rm -f app.jar.original || true
 
 # Create logs directory with proper permissions
 RUN mkdir -p /app/logs && \
@@ -50,9 +51,9 @@ ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
 # Set JVM options
 ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs/heap-dump.hprof"
 
-# Health check
+# Health check (matches server.port in application.yml)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8081/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
