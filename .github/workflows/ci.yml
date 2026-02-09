@@ -3,8 +3,6 @@ name: CI - Run Tests
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   test:
@@ -18,9 +16,18 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache:maven: true
+        cache: maven: true
 
     - name: Run Tests
-      # Using mvn test will run both unit and integration tests.
-      # Integration tests using Testcontainers work out-of-the-box on ubuntu-latest.
       run: mvn test
+
+    - name: Create Pull Request to Main
+      if: success()  # Only run if tests pass
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Auto PR: Merge dev into main after passing tests"
+        branch: main
+        base: main
+        title: "Merge dev into main (auto PR)"
+        body: "This PR is automatically created after CI tests passed on dev."
