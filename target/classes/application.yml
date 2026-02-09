@@ -1,35 +1,5 @@
-server:
-  port: 8080
-
-api:
-  version: /api/v1
-
 spring:
   application:
     name: api-gateway
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod}
-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: false # Keep false since you're using manual routes
-          lower-case-service-id: false # Add this to preserve case
-
-# Eureka settings are now profile-specific to avoid local registration in prod
-
-jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: refresh
+    active: ${APP_PROFILE:dev}

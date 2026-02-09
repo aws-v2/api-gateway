@@ -1,17 +1,30 @@
 server:
   port: ${SERVER_PORT:8080}
 
+api:
+  version: /api/v1
+
 spring:
   data:
     redis:
       host: ${DEV_REDIS_HOST:localhost}
       port: ${DEV_REDIS_PORT:6379}
-# Removed config server import
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-      defaultZone: ${DEV_EUREKA_URL:http://localhost:8761/eureka/}
+      defaultZone: ${DEV_EUREKA_URL:http://127.0.0.1:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
     registry-fetch-interval-seconds: 5
@@ -24,6 +37,12 @@ nats:
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
   expiration: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
 
 frontend:
   url: ${FRONTEND_URL:http://localhost:5173}

@@ -27,6 +27,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private com.microservices.gateway.service.NatsService natsService;
+
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     // List of public endpoints that don't require auth
@@ -71,6 +74,18 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                             return chain.filter(exchange);
                         } else {
                             // Invalid API Key
+                            String clientIp = "unknown";
+                            if (exchange.getRequest().getRemoteAddress() != null
+                                    && exchange.getRequest().getRemoteAddress().getAddress() != null) {
+                                clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+                            }
+
+                            natsService.publish("auth", "failure", java.util.Map.of(
+                                    "type", "API_KEY",
+                                    "path", path,
+                                    "ip", clientIp,
+                                    "timestamp", java.time.LocalDateTime.now().toString()));
+
                             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                             return exchange.getResponse().setComplete();
                         }
@@ -85,6 +100,18 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
                 // 3a. Validate Signature (Stateless)
                 if (!jwtUtil.isTokenValid(token)) {
+                    String clientIp = "unknown";
+                    if (exchange.getRequest().getRemoteAddress() != null
+                            && exchange.getRequest().getRemoteAddress().getAddress() != null) {
+                        clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+                    }
+
+                    natsService.publish("auth", "failure", java.util.Map.of(
+                            "type", "JWT_SIGNATURE",
+                            "path", path,
+                            "ip", clientIp,
+                            "timestamp", java.time.LocalDateTime.now().toString()));
+
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // Invalid Signature
                     return exchange.getResponse().setComplete();
                 }
@@ -94,6 +121,18 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 return redisService.isBlacklisted(tokenHash)
                         .flatMap(isBlacklisted -> {
                             if (isBlacklisted) {
+                                String clientIp = "unknown";
+                                if (exchange.getRequest().getRemoteAddress() != null
+                                        && exchange.getRequest().getRemoteAddress().getAddress() != null) {
+                                    clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+                                }
+
+                                natsService.publish("auth", "failure", java.util.Map.of(
+                                        "type", "TOKEN_REVOKED",
+                                        "path", path,
+                                        "ip", clientIp,
+                                        "timestamp", java.time.LocalDateTime.now().toString()));
+
                                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // Token is Revoked
                                 return exchange.getResponse().setComplete();
                             } else {

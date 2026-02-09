@@ -2,12 +2,12 @@ package com.microservices.gateway.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.microservices.gateway.util.JwtUtil;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -17,18 +17,25 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class NatsListener {
 
-    private final Connection natsConnection;
+    private final NatsService natsService;
     private final RedisService redisService;
-    private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${spring.profiles.active:dev}")
+    private String env;
 
     @PostConstruct
     public void setupListeners() {
-        Dispatcher dispatcher = natsConnection.createDispatcher((msg) -> {
+        if (natsService.getConnection() == null) {
+            log.warn("NATS connection not available, listener setup skipped");
+            return;
+        }
+
+        Dispatcher dispatcher = natsService.getConnection().createDispatcher((msg) -> {
         });
 
-        // 1. Token Blacklisted
-        dispatcher.subscribe("auth.token.blacklisted", (msg) -> {
+        // 1. Token Blacklisted - Standardized subject: <env>.auth.v1.token.blacklisted
+        dispatcher.subscribe(String.format("%s.auth.v1.token.blacklisted", env), (msg) -> {
             try {
                 String json = new String(msg.getData(), StandardCharsets.UTF_8);
                 JsonNode node = objectMapper.readTree(json);
@@ -42,8 +49,8 @@ public class NatsListener {
             }
         });
 
-        // 2. API Key Created
-        dispatcher.subscribe("auth.apikey.created", (msg) -> {
+        // 2. API Key Created - Standardized subject: <env>.auth.v1.apikey.created
+        dispatcher.subscribe(String.format("%s.auth.v1.apikey.created", env), (msg) -> {
             try {
                 String json = new String(msg.getData(), StandardCharsets.UTF_8);
                 JsonNode node = objectMapper.readTree(json);
@@ -57,8 +64,8 @@ public class NatsListener {
             }
         });
 
-        // 3. API Key Revoked
-        dispatcher.subscribe("auth.apikey.revoked", (msg) -> {
+        // 3. API Key Revoked - Standardized subject: <env>.auth.v1.apikey.revoked
+        dispatcher.subscribe(String.format("%s.auth.v1.apikey.revoked", env), (msg) -> {
             try {
                 String json = new String(msg.getData(), StandardCharsets.UTF_8);
                 JsonNode node = objectMapper.readTree(json);
