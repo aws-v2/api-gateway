@@ -12,6 +12,6 @@ class CorsConfigTest {
     @Test
     void corsWebFilterBeanCreation() {
         CorsWebFilter filter = corsConfig.corsWebFilter();
-        assertNotNull(filter, "CorsWebFilter bean should be created");
+        assertNotNull(filter, "CorsWebFilter bean should be created!");
     }
 }
