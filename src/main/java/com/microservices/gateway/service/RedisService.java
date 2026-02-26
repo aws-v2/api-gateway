@@ -31,9 +31,14 @@ public class RedisService {
         return redisTemplate.hasKey(APIKEY_PREFIX + accessKeyId);
     }
 
-    public void saveApiKey(String accessKeyId) {
-        // Persist API Keys indefinitely or until revocation
-        redisTemplate.opsForValue().set(APIKEY_PREFIX + accessKeyId, "valid").subscribe();
+    public void saveApiKey(String accessKeyId, String userId, String secretKeyHash) {
+        // Store as JSON for full validation
+        String data = String.format("{\"userId\":\"%s\",\"secretKeyHash\":\"%s\"}", userId, secretKeyHash);
+        redisTemplate.opsForValue().set(APIKEY_PREFIX + accessKeyId, data).subscribe();
+    }
+
+    public Mono<String> getApiKeyData(String accessKeyId) {
+        return redisTemplate.opsForValue().get(APIKEY_PREFIX + accessKeyId);
     }
 
     public void revokeApiKey(String accessKeyId) {

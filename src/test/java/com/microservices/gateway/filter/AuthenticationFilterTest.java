@@ -64,31 +64,36 @@ class AuthenticationFilterTest {
                 verify(chain, never()).filter(any());
         }
 
+        @Mock
+        private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
         @Test
         void filter_allowsValidApiKey() {
                 MockServerHttpRequest request = MockServerHttpRequest.get("/api/v1/protected")
-                                .header("X-API-Key", "valid-key")
+                                .header("X-API-Key", "validAccessKey:validSecret")
                                 .build();
                 MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-                when(redisService.isValidApiKey("valid-key")).thenReturn(Mono.just(true));
-                when(chain.filter(exchange)).thenReturn(Mono.empty());
+                String json = "{\"userId\":\"user123\",\"secretKeyHash\":\"hash\"}";
+                when(redisService.getApiKeyData("validAccessKey")).thenReturn(Mono.just(json));
+                when(passwordEncoder.matches("validSecret", "hash")).thenReturn(true);
+                when(chain.filter(any())).thenReturn(Mono.empty());
 
                 StepVerifier.create(authenticationFilter.filter(exchange, chain))
                                 .verifyComplete();
 
-                verify(chain, times(1)).filter(exchange);
+                verify(chain, times(1)).filter(any());
         }
 
         @Test
         void filter_publishesEventOnInvalidApiKey() {
                 MockServerHttpRequest request = MockServerHttpRequest.get("/api/v1/protected")
-                                .header("X-API-Key", "invalid-key")
+                                .header("X-API-Key", "invalidAccessKey:invalidSecret")
                                 .remoteAddress(new java.net.InetSocketAddress("127.0.0.1", 80))
                                 .build();
                 MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-                when(redisService.isValidApiKey("invalid-key")).thenReturn(Mono.just(false));
+                when(redisService.getApiKeyData("invalidAccessKey")).thenReturn(Mono.empty());
 
                 StepVerifier.create(authenticationFilter.filter(exchange, chain))
                                 .verifyComplete();

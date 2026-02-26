@@ -56,9 +56,13 @@ public class NatsListener {
                 JsonNode node = objectMapper.readTree(json);
                 if (node.has("accessKeyId")) {
                     String accessKeyId = node.get("accessKeyId").asText();
-                    redisService.saveApiKey(accessKeyId);
-                    log.info("Cached new API Key: {}", accessKeyId);
+                    String userId = node.has("userId") ? node.get("userId").asText() : "unknown";
+                    String secretKeyHash = node.has("secretKeyHash") ? node.get("secretKeyHash").asText() : "";
+
+                    redisService.saveApiKey(accessKeyId, userId, secretKeyHash);
+                    log.info("Cached new API Key: {} for user: {}", accessKeyId, userId);
                 }
+
             } catch (Exception e) {
                 log.error("Error processing apikey created event", e);
             }

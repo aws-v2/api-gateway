@@ -68,13 +68,18 @@ class RedisServiceTest {
     @Test
     void saveApiKey_callsSetOnRedis() {
         String accessKeyId = "testKey";
+        String userId = "testUserId";
+        String secretKeyHash = "testHash";
+
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.set(eq("apikey:" + accessKeyId), eq("valid")))
+
+        String expectedData = String.format("{\"userId\":\"%s\",\"secretKeyHash\":\"%s\"}", userId, secretKeyHash);
+        when(valueOperations.set(eq("apikey:" + accessKeyId), eq(expectedData)))
                 .thenReturn(Mono.just(true));
 
-        redisService.saveApiKey(accessKeyId);
+        redisService.saveApiKey(accessKeyId, userId, secretKeyHash);
 
-        verify(valueOperations, times(1)).set(eq("apikey:" + accessKeyId), eq("valid"));
+        verify(valueOperations, times(1)).set(eq("apikey:" + accessKeyId), eq(expectedData));
     }
 
     @Test
