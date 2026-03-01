@@ -141,16 +141,35 @@ public class GatewayConfig {
                                 .route("ec2-service", r -> r
                                                 .path(
                                                                 "/api/v1/ec2/instances/**",
+                                                                "/api/v1/compute/docs/**",
+                                                                "/api/v1/compute/fleet/**",
+
                                                                 "/api/v1/ec2/snapshots/**",
                                                                 "/api/v1/ec2/templates/**",
                                                                 "/api/v1/ec2/ssh-keys/**",
                                                                 "/api/v1/ec2/ip/**",
                                                                 "/api/v1/ec2/security-groups/**",
-                                                                "/api/v1/volumes/**")
+                                                                "/api/v1/ec2/volumes/**")
                                                 .filters(f -> f
                                                                 .stripPrefix(0)
                                                                 .filter(jwtAuthenticationFilter))
                                                 .uri("lb://ec2-service"))
+
+                                // =================================================
+                                // RDS SERVICE
+                                // =================================================
+
+                                .route("rds", r -> r
+                                                .path(
+                                                                "/api/v1/rds/databases/**",
+                                                                "/api/v1/rds/databases",
+                                                                "/api/v1/rds/snapshots/**",
+                                                                "/api/v1/rds/volumes/**",
+                                                                "/api/v1/rds/volumes")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .filter(jwtAuthenticationFilter))
+                                                .uri("lb://rds-service"))
 
                                 .build();
         }
