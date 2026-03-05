@@ -20,7 +20,7 @@ public class RateLimitFilter implements GlobalFilter, Ordered {
 
     private final ReactiveRedisTemplate<String, String> redisTemplate;
     private final com.microservices.gateway.service.NatsService natsService;
-    private static final int MAX_REQUESTS_PER_MINUTE = 100;
+    private static final int MAX_REQUESTS_PER_MINUTE = 500;
     private static final String RATE_LIMIT_PREFIX = "ratelimit:";
 
     @Override

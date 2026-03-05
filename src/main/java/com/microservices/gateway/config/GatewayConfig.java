@@ -8,6 +8,8 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class GatewayConfig {
@@ -20,6 +22,11 @@ public class GatewayConfig {
 
         @Value("${api.version}")
         private String apiVersion;
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
         @Bean
         public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -41,6 +48,7 @@ public class GatewayConfig {
                                                                 apiVersion + "/auth/forgot-password",
                                                                 apiVersion + "/auth/reset-password",
                                                                 apiVersion + "/auth/verify-email",
+                                                                apiVersion + "/auth/payment/**",
                                                                 apiVersion + "/auth/resend-verification")
                                                 .and()
                                                 .method("POST", "GET")
@@ -68,20 +76,22 @@ public class GatewayConfig {
 
                                 .route("bucket-service", r -> r
                                                 .path(
-                                                                "/api/v1/buckets/**",
-                                                                "/api/v1/files/**",
-                                                                "/api/v1/presign/**",
-                                                                "/api/v1/batch/**",
-                                                                "/api/v1/prefix/**",
-                                                                "/api/v1/analytics/**",
-                                                                "/api/v1/search/**",
-                                                                "/api/v1/multipart/**",
-                                                                "/api/v1/webhooks/**")
+                                                                "/api/v1/s3/buckets/**",
+                                                                "/api/v1/s3/files/**",
+                                                                "/api/v1/s3/presign/**",
+                                                                "/api/v1/s3/batch/**",
+                                                                "/api/v1/s3/prefix/**",
+                                                                "/api/v1/s3/analytics/**",
+                                                                "/api/v1/s3/docs/**",
+                                                                "/api/v1/s3/search/**",
+                                                                "/api/v1/s3/multipart/**",
+                                                                "/api/v1/s3/webhooks/**",
+                                                                "/api/v1/s3/security/**",
+                                                                "/api/v1/s3/health/**")
                                                 .filters(f -> f
-                                                                .stripPrefix(2)
+                                                                .stripPrefix(0)
                                                                 .filter(jwtAuthenticationFilter))
-                                                .uri("lb://S3-SERVICE") // Changed to uppercase
-                                )
+                                                .uri("lb://s3-service"))
                                 // =================================================
                                 // ADMIN SERVICE
                                 // =================================================
@@ -115,14 +125,52 @@ public class GatewayConfig {
                                 // =================================================
 
                                 .route("lambda-service", r -> r
-                                                .path("/api/v1/lambda/**")
+                                                .path(
+                                                                "/api/v1/lambda/**",
+                                                                "/api/v1/lambda/health/**")
                                                 .filters(f -> f
-                                                                .rewritePath(
-                                                                                "/api/v1/lambda/(?<segment>.*)",
-                                                                                "/api/v1/lambda/${segment}")
+                                                                .stripPrefix(0)
                                                                 .filter(jwtAuthenticationFilter)
                                                                 .filter(adminRoleFilter))
                                                 .uri("lb://lambda-service"))
+
+                                // =================================================
+                                // EC2 SERVICE
+                                // =================================================
+
+                                .route("ec2-service", r -> r
+                                                .path(
+                                                                "/api/v1/ec2/instances/**",
+                                                                "/api/v1/compute/docs/**",
+                                                                "/api/v1/compute/fleet/**",
+
+                                                                "/api/v1/ec2/snapshots/**",
+                                                                "/api/v1/ec2/templates/**",
+                                                                "/api/v1/ec2/ssh-keys/**",
+                                                                "/api/v1/ec2/ip/**",
+                                                                "/api/v1/ec2/security-groups/**",
+                                                                "/api/v1/ec2/volumes/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .filter(jwtAuthenticationFilter))
+                                                .uri("lb://ec2-service"))
+
+                                // =================================================
+                                // RDS SERVICE
+                                // =================================================
+
+                                .route("rds", r -> r
+                                                .path(
+                                                                "/api/v1/rds/databases/**",
+                                                                "/api/v1/rds/databases",
+                                                                "/api/v1/rds/snapshots/**",
+                                                                "/api/v1/rds/docs/**",
+                                                                "/api/v1/rds/volumes/**",
+                                                                "/api/v1/rds/volumes")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .filter(jwtAuthenticationFilter))
+                                                .uri("lb://rds-service"))
 
                                 .build();
         }

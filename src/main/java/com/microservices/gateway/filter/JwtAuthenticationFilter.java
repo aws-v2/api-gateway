@@ -20,14 +20,25 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
+        // Skip if already authenticated by Global Filter (API Key)
+        if (request.getHeaders().containsKey("X-User-Id")) {
+            return chain.filter(exchange);
+        }
+
         String authHeader = request.getHeaders().getFirst("Authorization");
-        System.out.println(authHeader);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String token = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        } else {
+            // Fallback to query parameter for WebSockets
+            token = request.getQueryParams().getFirst("token");
+        }
+
+        if (token == null || token.isEmpty()) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-
-        String token = authHeader.substring(7);
 
         if (!jwtUtil.isTokenValid(token)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

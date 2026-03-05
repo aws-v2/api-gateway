@@ -2,6 +2,7 @@ com\microservices\gateway\filter\AuthenticationFilter.class
 com\microservices\gateway\config\CorsConfig.class
 com\microservices\gateway\filter\JwtAuthenticationFilter.class
 com\microservices\gateway\service\NatsService.class
+com\microservices\gateway\config\SecurityConfig.class
 com\microservices\gateway\util\LeetCode.class
 com\microservices\gateway\config\GatewayConfig.class
 com\microservices\gateway\filter\AdminRoleFilter.class

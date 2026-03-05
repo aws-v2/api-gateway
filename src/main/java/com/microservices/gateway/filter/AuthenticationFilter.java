@@ -1,8 +1,12 @@
 package com.microservices.gateway.filter;
 
 import com.microservices.gateway.service.RedisService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import com.microservices.gateway.util.JwtUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.util.AntPathMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -28,7 +32,12 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private RedisService redisService;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private com.microservices.gateway.service.NatsService natsService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -64,32 +73,48 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         // 2. Check for API Key (X-API-Key)
         if (exchange.getRequest().getHeaders().containsKey("X-API-Key")) {
-            String apiKey = exchange.getRequest().getHeaders().getFirst("X-API-Key");
-            // Validate API Key via Redis
-            return redisService.isValidApiKey(apiKey)
-                    .flatMap(isValid -> {
-                        if (isValid) {
-                            // If valid, mutation (e.g. adding user ID) could happen here if we tracked it
-                            // in Redis
-                            return chain.filter(exchange);
-                        } else {
-                            // Invalid API Key
-                            String clientIp = "unknown";
-                            if (exchange.getRequest().getRemoteAddress() != null
-                                    && exchange.getRequest().getRemoteAddress().getAddress() != null) {
-                                clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+            String apiKeyHeader = exchange.getRequest().getHeaders().getFirst("X-API-Key");
+
+            // Expected format: accessKeyId:secretAccessKey
+            String[] parts = apiKeyHeader.split(":", 2);
+            if (parts.length != 2) {
+                return failAuth(exchange, path, "INVALID_API_KEY_FORMAT");
+            }
+
+            String accessKeyId = parts[0];
+            String secretAccessKey = parts[1];
+
+            return redisService.getApiKeyData(accessKeyId)
+                    .flatMap(dataJson -> {
+                        try {
+                            // Check if data is the old plaintext format (e.g. "valid") or missing JSON
+                            // structure
+                            if (dataJson != null && !dataJson.trim().startsWith("{")) {
+                                log.warn("API key data for {} is not in JSON format. Found: {}", accessKeyId, dataJson);
+                                // For backward compatibility or invalid keys, we must fail if we can't extract
+                                // userId
+                                return failAuth(exchange, path, "INVALID_API_KEY_FORMAT_IN_DB");
                             }
 
-                            natsService.publish("auth", "failure", java.util.Map.of(
-                                    "type", "API_KEY",
-                                    "path", path,
-                                    "ip", clientIp,
-                                    "timestamp", java.time.LocalDateTime.now().toString()));
+                            JsonNode node = objectMapper.readTree(dataJson);
+                            String userId = node.get("userId").asText();
+                            String secretKeyHash = node.get("secretKeyHash").asText();
 
-                            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                            return exchange.getResponse().setComplete();
+                            if (passwordEncoder.matches(secretAccessKey, secretKeyHash)) {
+                                log.info("Authenticated API Key for user: {}", userId);
+                                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                                        .header("X-User-Id", userId)
+                                        .build();
+                                return chain.filter(exchange.mutate().request(mutatedRequest).build());
+                            } else {
+                                return failAuth(exchange, path, "INVALID_SECRET");
+                            }
+                        } catch (Exception e) {
+                            log.error("Error parsing API key data for {}: {}", accessKeyId, e.getMessage());
+                            return failAuth(exchange, path, "SERVER_ERROR");
                         }
-                    });
+                    })
+                    .switchIfEmpty(Mono.defer(() -> failAuth(exchange, path, "API_KEY_NOT_FOUND")));
         }
 
         // 3. Check for JWT (Authorization: Bearer ...)
@@ -100,20 +125,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
                 // 3a. Validate Signature (Stateless)
                 if (!jwtUtil.isTokenValid(token)) {
-                    String clientIp = "unknown";
-                    if (exchange.getRequest().getRemoteAddress() != null
-                            && exchange.getRequest().getRemoteAddress().getAddress() != null) {
-                        clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
-                    }
-
-                    natsService.publish("auth", "failure", java.util.Map.of(
-                            "type", "JWT_SIGNATURE",
-                            "path", path,
-                            "ip", clientIp,
-                            "timestamp", java.time.LocalDateTime.now().toString()));
-
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // Invalid Signature
-                    return exchange.getResponse().setComplete();
+                    return failAuth(exchange, path, "JWT_SIGNATURE");
                 }
 
                 // 3b. Check Blacklist (Stateful)
@@ -121,20 +133,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 return redisService.isBlacklisted(tokenHash)
                         .flatMap(isBlacklisted -> {
                             if (isBlacklisted) {
-                                String clientIp = "unknown";
-                                if (exchange.getRequest().getRemoteAddress() != null
-                                        && exchange.getRequest().getRemoteAddress().getAddress() != null) {
-                                    clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
-                                }
-
-                                natsService.publish("auth", "failure", java.util.Map.of(
-                                        "type", "TOKEN_REVOKED",
-                                        "path", path,
-                                        "ip", clientIp,
-                                        "timestamp", java.time.LocalDateTime.now().toString()));
-
-                                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // Token is Revoked
-                                return exchange.getResponse().setComplete();
+                                return failAuth(exchange, path, "TOKEN_REVOKED");
                             } else {
                                 // Valid Token: Extract Claims & Forward
                                 String userId = jwtUtil.extractUserId(token);
@@ -148,6 +147,22 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         // 4. No Auth Header found
+        return failAuth(exchange, path, "MISSING_CREDENTIALS");
+    }
+
+    private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
+        String clientIp = "unknown";
+        if (exchange.getRequest().getRemoteAddress() != null
+                && exchange.getRequest().getRemoteAddress().getAddress() != null) {
+            clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+        }
+
+        natsService.publish("auth", "failure", java.util.Map.of(
+                "type", type,
+                "path", path,
+                "ip", clientIp,
+                "timestamp", java.time.LocalDateTime.now().toString()));
+
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
     }
