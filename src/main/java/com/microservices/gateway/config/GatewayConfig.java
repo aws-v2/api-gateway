@@ -164,6 +164,7 @@ public class GatewayConfig {
                                                                 "/api/v1/rds/databases/**",
                                                                 "/api/v1/rds/databases",
                                                                 "/api/v1/rds/snapshots/**",
+                                                                "/api/v1/rds/docs/**",
                                                                 "/api/v1/rds/volumes/**",
                                                                 "/api/v1/rds/volumes")
                                                 .filters(f -> f
