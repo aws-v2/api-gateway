@@ -1,10 +1,10 @@
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\config\CorsConfigTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\config\GatewayConfigTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\filter\AdminRoleFilterTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\filter\AuthenticationFilterTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\filter\JwtAuthenticationFilterTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\filter\RateLimitFilterTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\service\NatsListenerTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\service\NatsServiceTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\service\RedisServiceTest.java
-C:\Users\0x6D617274696E\Desktop\aws-v2\backend\New folder\api-gateway\src\test\java\com\microservices\gateway\util\JwtUtilTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/config/CorsConfigTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/config/GatewayConfigTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/filter/AdminRoleFilterTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/filter/AuthenticationFilterTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/filter/JwtAuthenticationFilterTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/filter/RateLimitFilterTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/service/NatsListenerTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/service/NatsServiceTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/service/RedisServiceTest.java
+/home/martin/Desktop/aws-v7/api-gateway/src/test/java/com/microservices/gateway/util/JwtUtilTest.java
