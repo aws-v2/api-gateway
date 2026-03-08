@@ -141,9 +141,11 @@ public class GatewayConfig {
                                 .route("ec2-service", r -> r
                                                 .path(
                                                                 "/api/v1/ec2/instances/**",
+                                                                "/api/v1/ec2/scaling-policies/**",
                                                                 "/api/v1/compute/docs/**",
                                                                 "/api/v1/compute/fleet/**",
-"/api/v1/compute/instances/**","/api/v1/compute/**",
+                                                                "/api/v1/compute/instances/**",
+                                                                "/api/v1/compute/**",   
                                                                 "/api/v1/ec2/snapshots/**",
                                                                 "/api/v1/ec2/templates/**",
                                                                   "/api/v1/ec2/vpcs/**",
