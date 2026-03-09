@@ -127,6 +127,7 @@ public class GatewayConfig {
                                 .route("lambda-service", r -> r
                                                 .path(
                                                                 "/api/v1/lambda/**",
+                                                                "/api/v1/lambda/scaling-policies/**",
                                                                 "/api/v1/lambda/health/**")
                                                 .filters(f -> f
                                                                 .stripPrefix(0)
@@ -167,6 +168,7 @@ public class GatewayConfig {
                                                 .path(
                                                                 "/api/v1/rds/databases/**",
                                                                 "/api/v1/rds/databases",
+                                                                "/api/v1/rds/scaling-policies/**",
                                                                 "/api/v1/rds/snapshots/**",
                                                                 "/api/v1/rds/docs/**",
                                                                  "/api/v1/rds/vpcs/**",
