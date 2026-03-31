@@ -125,7 +125,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
                 // 3a. Validate Signature (Stateless)
                 if (!jwtUtil.isTokenValid(token)) {
-                    return failAuth(exchange, path, "JWT_SIGNATURE");
+                    return failAuth(exchange, path, "JWT_1SIGNATURE");
                 }
 
                 // 3b. Check Blacklist (Stateful)
@@ -157,6 +157,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
         }
 
+        log.warn("Auth failed: {} for path: {} from IP: {}", type, path, clientIp);
         natsService.publish("auth", "failure", java.util.Map.of(
                 "type", type,
                 "path", path,

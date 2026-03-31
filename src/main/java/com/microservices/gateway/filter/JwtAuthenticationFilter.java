@@ -1,6 +1,7 @@
 package com.microservices.gateway.filter;
 
 import com.microservices.gateway.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -11,6 +12,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter implements GatewayFilter {
 
     @Autowired
@@ -36,11 +38,13 @@ public class JwtAuthenticationFilter implements GatewayFilter {
         }
 
         if (token == null || token.isEmpty()) {
+            log.warn("Auth failed: MISSING_TOKEN for path: {}", request.getURI().getPath());
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
         if (!jwtUtil.isTokenValid(token)) {
+            log.warn("Auth failed: INVALID_TOKEN for path: {}", request.getURI().getPath());
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }

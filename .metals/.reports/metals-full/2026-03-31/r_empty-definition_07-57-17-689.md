@@ -1,3 +1,14 @@
+error id: file://<WORKSPACE>/src/main/java/com/microservices/gateway/config/GatewayConfig.java:_empty_/JwtAuthenticationFilter#
+file://<WORKSPACE>/src/main/java/com/microservices/gateway/config/GatewayConfig.java
+empty definition using pc, found symbol in pc: _empty_/JwtAuthenticationFilter#
+empty definition using semanticdb
+empty definition using fallback
+non-local guesses:
+
+offset: 792
+uri: file://<WORKSPACE>/src/main/java/com/microservices/gateway/config/GatewayConfig.java
+text:
+```scala
 package com.microservices.gateway.config;
 
 import com.microservices.gateway.filter.AdminRoleFilter;
@@ -15,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class GatewayConfig {
 
         @Autowired
-        private JwtAuthenticationFilter jwtAuthenticationFilter;
+        private JwtAuthenticati@@onFilter jwtAuthenticationFilter;
 
         @Autowired
         private AdminRoleFilter adminRoleFilter;
@@ -165,7 +176,7 @@ public class GatewayConfig {
                                 // =================================================
 
 
-.route("gamelift-server", r -> r
+.route("gamelift-service", r -> r
     .path(
         apiVersion + "/gamelift/**",
         "/ws/**")
@@ -195,3 +206,10 @@ public class GatewayConfig {
                                 .build();
         }
 }
+
+```
+
+
+#### Short summary: 
+
+empty definition using pc, found symbol in pc: _empty_/JwtAuthenticationFilter#
