@@ -168,7 +168,7 @@ public class GatewayConfig {
 .route("gamelift-server", r -> r
     .path(
         apiVersion + "/gamelift/**",
-        "/ws/**")
+        apiVersion + "/ws/**")
     .filters(f -> f
         .filter(jwtAuthenticationFilter))
     .uri("lb://gamelift-server"))

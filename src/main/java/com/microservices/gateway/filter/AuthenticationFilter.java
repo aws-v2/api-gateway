@@ -117,33 +117,40 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                     .switchIfEmpty(Mono.defer(() -> failAuth(exchange, path, "API_KEY_NOT_FOUND")));
         }
 
-        // 3. Check for JWT (Authorization: Bearer ...)
+        // 3. Extract Token (Authorization Header or Query Param)
+        String extractedToken = null;
         if (exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
-
-                // 3a. Validate Signature (Stateless)
-                if (!jwtUtil.isTokenValid(token)) {
-                    return failAuth(exchange, path, "JWT_1SIGNATURE");
-                }
-
-                // 3b. Check Blacklist (Stateful)
-                String tokenHash = jwtUtil.getTokenHash(token);
-                return redisService.isBlacklisted(tokenHash)
-                        .flatMap(isBlacklisted -> {
-                            if (isBlacklisted) {
-                                return failAuth(exchange, path, "TOKEN_REVOKED");
-                            } else {
-                                // Valid Token: Extract Claims & Forward
-                                String userId = jwtUtil.extractUserId(token);
-                                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                                        .header("X-User-Id", userId)
-                                        .build();
-                                return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                            }
-                        });
+                extractedToken = authHeader.substring(7);
             }
+        } else {
+            // Fallback for WebSockets: check for 'token' query parameter
+            extractedToken = exchange.getRequest().getQueryParams().getFirst("token");
+        }
+
+        final String token = extractedToken;
+        if (token != null) {
+            // 3a. Validate Signature (Stateless)
+            if (!jwtUtil.isTokenValid(token)) {
+                return failAuth(exchange, path, "JWT_SIGNATURE");
+            }
+
+            // 3b. Check Blacklist (Stateful)
+            String tokenHash = jwtUtil.getTokenHash(token);
+            return redisService.isBlacklisted(tokenHash)
+                    .flatMap(isBlacklisted -> {
+                        if (isBlacklisted) {
+                            return failAuth(exchange, path, "TOKEN_REVOKED");
+                        } else {
+                            // Valid Token: Extract Claims & Forward
+                            String userId = jwtUtil.extractUserId(token);
+                            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                                    .header("X-User-Id", userId)
+                                    .build();
+                            return chain.filter(exchange.mutate().request(mutatedRequest).build());
+                        }
+                    });
         }
 
         // 4. No Auth Header found
