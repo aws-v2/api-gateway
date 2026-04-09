@@ -161,6 +161,19 @@ public class GatewayConfig {
                                                 .uri("lb://ec2-service"))
 
                                 // =================================================
+                                // AI ORCHESTRATOR SERVICE
+                                // =================================================
+
+                                .route("ai-orchestrator", r -> r
+                                                .path(
+                                                                "/api/v1/jobs/**",
+                                                                "/api/v1/jobs")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .filter(jwtAuthenticationFilter))
+                                                .uri("lb://ai-orchestrator"))
+
+                                // =================================================
                                 // GAMELIFT SERVICE
                                 // =================================================
 
@@ -168,7 +181,8 @@ public class GatewayConfig {
 .route("gamelift-server", r -> r
     .path(
         apiVersion + "/gamelift/**",
-        apiVersion + "/ws/**")
+        apiVersion + "/ws/**",
+        apiVersion + "/webrtc/**")
     .filters(f -> f
         .filter(jwtAuthenticationFilter))
     .uri("lb://gamelift-server"))
