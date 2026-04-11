@@ -2,4 +2,4 @@ spring:
   application:
     name: api-gateway
   profiles:
-    active: ${APP_PROFILE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:dev}

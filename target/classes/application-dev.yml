@@ -1,8 +1,20 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${DEV_SERVER_PORT:8080}
 
 api:
-  version: /api/v1
+  version: ${DEV_API_VERSION:/api/v1}
+
+frontend:
+  url: ${DEV_FRONTEND_URL:http://localhost:5173}
+
+jwt:
+  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: 86400000
+  
+nats:
+  url: ${DEV_NATS_URL:nats://localhost:4222}
+  username: ${DEV_NATS_USERNAME:auth-server}
+  password: ${DEV_NATS_PASSWORD:auth-secret}
 
 spring:
   data:
@@ -11,19 +23,6 @@ spring:
       port: ${DEV_REDIS_PORT:6379}
   cloud:
     gateway:
-      globalcors:
-        add-to-idm-strategy: BEFORE_DEFAULT
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:5173"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
       discovery:
         locator:
           enabled: true
@@ -42,14 +41,7 @@ eureka:
     register-with-eureka: true
     registry-fetch-interval-seconds: 5
 
-nats:
-  url: ${DEV_NATS_URL:nats://localhost:4222}
-  username: ${DEV_NATS_USERNAME:auth-server}
-  password: ${DEV_NATS_PASSWORD:auth-secret}
 
-jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000
 
 management:
   endpoints:
@@ -57,5 +49,9 @@ management:
       exposure:
         include: refresh
 
-frontend:
-  url: ${FRONTEND_URL:http://localhost:5173}
+logging:
+  level:
+    root: DEBUG
+    "[com.netflix.eureka]": DEBUG
+    "[com.netflix.discovery]": DEBUG
+

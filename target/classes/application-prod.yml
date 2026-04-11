@@ -1,14 +1,29 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PROD_SERVER_PORT:8080}
 
 api:
-  version: /api/v1
+  version: ${PROD_API_VERSION}
+
+frontend:
+  url: ${PROD_FRONTEND_URL}
+
+jwt:
+  secret: ${PROD_JWT_SECRET}
+  expiration: 86400000
+
+
+nats:
+  url: ${PROD_NATS_URL}
+  username: ${PROD_NATS_USERNAME}
+  password: ${PROD_NATS_PASSWORD}
+
+
 
 spring:
   data:
     redis:
-      host: ${PROD_REDIS_HOST:redis-server}
-      port: ${PROD_REDIS_PORT:6379}
+      host: ${PROD_REDIS_HOST}
+      port: ${PROD_REDIS_PORT}
   cloud:
     gateway:
       discovery:
@@ -21,21 +36,14 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${PROD_EUREKA_URL:https://discovery-server-latest-6p1n.onrender.com/eureka/}
+      defaultZone: ${PROD_EUREKA_URL}
     fetch-registry: true
     register-with-eureka: true
     registry-fetch-interval-seconds: 30
   instance:
     prefer-ip-address: true
 
-nats:
-  url: ${PROD_NATS_URL}
-  username: ${PROD_NATS_USERNAME}
-  password: ${PROD_NATS_PASSWORD}
 
-jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000
 
 management:
   endpoints:
@@ -43,5 +51,9 @@ management:
       exposure:
         include: refresh
 
-frontend:
-  url: ${FRONTEND_URL}
+logging:
+  level:
+    root: INFO
+    "[com.netflix.eureka]": INFO
+    "[com.netflix.discovery]": INFO
+
