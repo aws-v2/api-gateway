@@ -1,11 +1,7 @@
 package com.microservices.gateway.filter;
 
-import com.microservices.gateway.service.RedisService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import com.microservices.gateway.util.JwtUtil;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.util.AntPathMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +25,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private RedisService redisService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private com.microservices.gateway.service.NatsService natsService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -71,53 +60,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        // 2. Check for API Key (X-API-Key)
-        if (exchange.getRequest().getHeaders().containsKey("X-API-Key")) {
-            String apiKeyHeader = exchange.getRequest().getHeaders().getFirst("X-API-Key");
-
-            // Expected format: accessKeyId:secretAccessKey
-            String[] parts = apiKeyHeader.split(":", 2);
-            if (parts.length != 2) {
-                return failAuth(exchange, path, "INVALID_API_KEY_FORMAT");
-            }
-
-            String accessKeyId = parts[0];
-            String secretAccessKey = parts[1];
-
-            return redisService.getApiKeyData(accessKeyId)
-                    .flatMap(dataJson -> {
-                        try {
-                            // Check if data is the old plaintext format (e.g. "valid") or missing JSON
-                            // structure
-                            if (dataJson != null && !dataJson.trim().startsWith("{")) {
-                                log.warn("API key data for {} is not in JSON format. Found: {}", accessKeyId, dataJson);
-                                // For backward compatibility or invalid keys, we must fail if we can't extract
-                                // userId
-                                return failAuth(exchange, path, "INVALID_API_KEY_FORMAT_IN_DB");
-                            }
-
-                            JsonNode node = objectMapper.readTree(dataJson);
-                            String userId = node.get("userId").asText();
-                            String secretKeyHash = node.get("secretKeyHash").asText();
-
-                            if (passwordEncoder.matches(secretAccessKey, secretKeyHash)) {
-                                log.info("Authenticated API Key for user: {}", userId);
-                                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                                        .header("X-User-Id", userId)
-                                        .build();
-                                return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                            } else {
-                                return failAuth(exchange, path, "INVALID_SECRET");
-                            }
-                        } catch (Exception e) {
-                            log.error("Error parsing API key data for {}: {}", accessKeyId, e.getMessage());
-                            return failAuth(exchange, path, "SERVER_ERROR");
-                        }
-                    })
-                    .switchIfEmpty(Mono.defer(() -> failAuth(exchange, path, "API_KEY_NOT_FOUND")));
-        }
-
-        // 3. Extract Token (Authorization Header or Query Param)
+        // 2. Extract Token (Authorization Header or Query Param)
         String extractedToken = null;
         if (exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
@@ -131,29 +74,20 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         final String token = extractedToken;
         if (token != null) {
-            // 3a. Validate Signature (Stateless)
+            // Validate Signature (Stateless)
             if (!jwtUtil.isTokenValid(token)) {
                 return failAuth(exchange, path, "JWT_SIGNATURE");
             }
 
-            // 3b. Check Blacklist (Stateful)
-            String tokenHash = jwtUtil.getTokenHash(token);
-            return redisService.isBlacklisted(tokenHash)
-                    .flatMap(isBlacklisted -> {
-                        if (isBlacklisted) {
-                            return failAuth(exchange, path, "TOKEN_REVOKED");
-                        } else {
-                            // Valid Token: Extract Claims & Forward
-                            String userId = jwtUtil.extractUserId(token);
-                            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                                    .header("X-User-Id", userId)
-                                    .build();
-                            return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                        }
-                    });
+            // Valid Token: Extract Claims & Forward
+            String userId = jwtUtil.extractUserId(token);
+            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                    .header("X-User-Id", userId)
+                    .build();
+            return chain.filter(exchange.mutate().request(mutatedRequest).build());
         }
 
-        // 4. No Auth Header found
+        // 3. No Auth Header found
         return failAuth(exchange, path, "MISSING_CREDENTIALS");
     }
 

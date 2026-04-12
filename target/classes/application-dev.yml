@@ -16,11 +16,6 @@ nats:
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
 
-spring:
-  data:
-    redis:
-      host: ${DEV_REDIS_HOST:localhost}
-      port: ${DEV_REDIS_PORT:6379}
   cloud:
     gateway:
       discovery:

@@ -20,10 +20,6 @@ nats:
 
 
 spring:
-  data:
-    redis:
-      host: ${PROD_REDIS_HOST}
-      port: ${PROD_REDIS_PORT}
   cloud:
     gateway:
       discovery:
