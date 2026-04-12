@@ -43,7 +43,7 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-      defaultZone: ${STAGING_EUREKA_URL:http://discovery-server:8761/eureka/}
+      defaultZone: ${STAGING_EUREKA_URL:http://discovery-server-staging:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
 
