@@ -31,8 +31,6 @@ public class GatewayConfig {
         @Bean
         public RouteLocator routes(RouteLocatorBuilder builder) {
 
-                System.out.println(apiVersion + "------------------=");
-
                 return builder.routes()
 
                                 // =================================================
