@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
     - uses: actions/checkout@v4
 
@@ -21,3 +24,15 @@ jobs:
 
     - name: Build and Test with Maven
       run: mvn clean verify
+
+    - name: Create Pull Request to Staging
+      if: github.event_name == 'push' && (github.ref_name == 'dev' || github.ref_name == 'develop')
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh pr create \
+          --base staging \
+          --head ${{ github.ref_name }} \
+          --title "Merge ${{ github.ref_name }} into staging" \
+          --body "Automated PR created by GitHub Actions after successful CI on ${{ github.ref_name }}" \
+          || echo "PR already exists or error occurred"

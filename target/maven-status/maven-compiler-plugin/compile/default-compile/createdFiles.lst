@@ -1,5 +1,4 @@
 com/microservices/gateway/config/CorsConfig.class
-com/microservices/gateway/util/Row.class
 com/microservices/gateway/filter/AdminRoleFilter.class
 com/microservices/gateway/filter/JwtAuthenticationFilter.class
 com/microservices/gateway/filter/AuthenticationFilter.class
@@ -9,4 +8,3 @@ com/microservices/gateway/config/GatewayConfig.class
 com/microservices/gateway/service/NatsService.class
 com/microservices/gateway/service/NatsListener.class
 com/microservices/gateway/util/JwtUtil.class
-com/microservices/gateway/util/LeetCode.class

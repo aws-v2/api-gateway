@@ -54,9 +54,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // 1. Allow public endpoints
-        log.info("Processing request for path: {}", path);
         if (isPublicEndpoint(path)) {
-            log.info("Path {} is public, bypassing auth", path);
             return chain.filter(exchange);
         }
 
