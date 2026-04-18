@@ -46,6 +46,7 @@ public class GatewayConfig {
                                                                 apiVersion + "/auth/forgot-password",
                                                                 apiVersion + "/auth/reset-password",
                                                                 apiVersion + "/auth/verify-email",
+                                                                apiVersion + "/auth/docs/**",
                                                                 apiVersion + "/auth/payment/**",
                                                                 apiVersion + "/auth/resend-verification")
                                                 .and()
@@ -59,6 +60,7 @@ public class GatewayConfig {
                                                                 apiVersion + "/auth/mfa/enable",
                                                                 apiVersion + "/auth/mfa/disable",
                                                                 apiVersion + "/auth/logout",
+                                                                apiVersion + "/auth/docs/internal/**",
                                                                 apiVersion + "/auth/me",
                                                                 apiVersion + "/auth/api-keys/**")
                                                 .filters(f -> f
@@ -103,7 +105,14 @@ public class GatewayConfig {
                                                                 .filter(jwtAuthenticationFilter)
                                                                 .filter(adminRoleFilter))
                                                 .uri("lb://admin-service"))
+                                // =================================================
+                                // IAM SERVICE
+                                // =================================================
 
+                                .route("iam-docs", r -> r
+                                                .path("/api/v1/identity/**")
+
+                                                .uri("lb://iam"))
                                 // =================================================
                                 // FARGATe SERVICE
                                 // =================================================
@@ -144,11 +153,11 @@ public class GatewayConfig {
                                                                 "/api/v1/compute/docs/**",
                                                                 "/api/v1/compute/fleet/**",
                                                                 "/api/v1/compute/instances/**",
-                                                                "/api/v1/compute/**",   
+                                                                "/api/v1/compute/**",
                                                                 "/api/v1/ec2/snapshots/**",
                                                                 "/api/v1/ec2/templates/**",
-                                                                  "/api/v1/ec2/vpcs/**",
-                                                                    "/api/v1/ec2/vpcs/**",
+                                                                "/api/v1/ec2/vpcs/**",
+                                                                "/api/v1/ec2/vpcs/**",
                                                                 "/api/v1/ec2/ssh-keys/**",
                                                                 "/api/v1/ec2/ip/**",
                                                                 "/api/v1/ec2/security-groups/**",
@@ -175,17 +184,16 @@ public class GatewayConfig {
                                 // GAMELIFT SERVICE
                                 // =================================================
 
+                                .route("gamelift-server", r -> r
+                                                .path(
+                                                                apiVersion + "/gamelift/**",
+                                                                apiVersion + "/ws/**",
+                                                                apiVersion + "/webrtc/**")
+                                                .filters(f -> f
+                                                                .filter(jwtAuthenticationFilter))
+                                                .uri("lb://gamelift-server"))
 
-.route("gamelift-server", r -> r
-    .path(
-        apiVersion + "/gamelift/**",
-        apiVersion + "/ws/**",
-        apiVersion + "/webrtc/**")
-    .filters(f -> f
-        .filter(jwtAuthenticationFilter))
-    .uri("lb://gamelift-server"))
-
-     // =================================================
+                                // =================================================
                                 // RDS SERVICE
                                 // =================================================
                                 .route("rds", r -> r
@@ -195,8 +203,8 @@ public class GatewayConfig {
                                                                 "/api/v1/rds/scaling-policies/**",
                                                                 "/api/v1/rds/snapshots/**",
                                                                 "/api/v1/rds/docs/**",
-                                                                 "/api/v1/rds/vpcs/**",
-                                                                 "/api/v1/rds/vpcs",
+                                                                "/api/v1/rds/vpcs/**",
+                                                                "/api/v1/rds/vpcs",
                                                                 "/api/v1/rds/volumes/**",
                                                                 "/api/v1/rds/volumes")
                                                 .filters(f -> f
