@@ -2,9 +2,14 @@
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/config/CorsConfig.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/config/GatewayConfig.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/config/SecurityConfig.java
+/home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/controller/InternalDocsController.java
+/home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/controller/PublicDocsController.java
+/home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/dto/DocResponse.java
+/home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/enums/DocType.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AdminRoleFilter.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/JwtAuthenticationFilter.java
+/home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/service/DocsService.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/service/NatsListener.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/service/NatsService.java
 /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/util/JwtUtil.java
