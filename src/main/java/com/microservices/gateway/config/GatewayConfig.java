@@ -118,7 +118,9 @@ public class GatewayConfig {
                                 // =================================================
 
                                 .route("fargate-service", r -> r
-                                                .path("/api/v1/fargate/**")
+                                                .path("/api/v1/fargate/**",
+                                                                "/api/v1/fargate/docs/**",
+                                                                        "/api/v1/fargate/internal/docs/**")
                                                 .filters(f -> f
                                                                 .rewritePath(
                                                                                 "/api/v1/fargate/(?<segment>.*)",
