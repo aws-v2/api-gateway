@@ -141,32 +141,40 @@ public class GatewayConfig {
                                                                 .filter(jwtAuthenticationFilter)
                                                                 .filter(adminRoleFilter))
                                                 .uri("lb://lambda-service"))
+// EC2 public docs - no auth
+.route("ec2-docs-public", r -> r
+        .path("/api/v1/ec2/docs/**")
+        .filters(f -> f.stripPrefix(0))
+        .uri("lb://ec2-service"))
 
-                                // =================================================
-                                // EC2 SERVICE
-                                // =================================================
+// EC2 internal docs - auth required
+.route("ec2-docs-internal", r -> r
+        .path("/api/v1/ec2/internal/docs/**")
+        .filters(f -> f
+                .stripPrefix(0)
+                .filter(jwtAuthenticationFilter))
+        .uri("lb://ec2-service"))
 
-                                .route("ec2-service", r -> r
-                                                .path(
-                                                                "/api/v1/ec2/instances/**",
-                                                                "/api/v1/ec2/scaling-policies/**",
-                                                                "/api/v1/compute/docs/**",
-                                                                "/api/v1/compute/fleet/**",
-                                                                "/api/v1/compute/instances/**",
-                                                                "/api/v1/compute/**",
-                                                                "/api/v1/ec2/snapshots/**",
-                                                                "/api/v1/ec2/templates/**",
-                                                                "/api/v1/ec2/vpcs/**",
-                                                                "/api/v1/ec2/vpcs/**",
-                                                                "/api/v1/ec2/ssh-keys/**",
-                                                                "/api/v1/ec2/ip/**",
-                                                                "/api/v1/ec2/security-groups/**",
-                                                                "/api/v1/ec2/volumes/**")
-                                                .filters(f -> f
-                                                                .stripPrefix(0)
-                                                                .filter(jwtAuthenticationFilter))
-                                                .uri("lb://ec2-service"))
-
+// EC2 everything else - auth required
+.route("ec2-service", r -> r
+        .path(
+                "/api/v1/ec2/instances/**",
+                "/api/v1/ec2/scaling-policies/**",
+                "/api/v1/compute/docs/**",
+                "/api/v1/compute/fleet/**",
+                "/api/v1/compute/instances/**",
+                "/api/v1/compute/**",
+                "/api/v1/ec2/snapshots/**",
+                "/api/v1/ec2/templates/**",
+                "/api/v1/ec2/vpcs/**",
+                "/api/v1/ec2/ssh-keys/**",
+                "/api/v1/ec2/ip/**",
+                "/api/v1/ec2/security-groups/**",
+                "/api/v1/ec2/volumes/**")
+        .filters(f -> f
+                .stripPrefix(0)
+                .filter(jwtAuthenticationFilter))
+        .uri("lb://ec2-service"))
                                 // =================================================
                                 // AI ORCHESTRATOR SERVICE
                                 // =================================================
