@@ -113,6 +113,15 @@ public class GatewayConfig {
                                                 .path("/api/v1/identity/**")
 
                                                 .uri("lb://iam"))
+                  // =================================================
+                                // Networking docs
+                                // =================================================
+                                 .route("networking-docs", r -> r
+                                                .path("/api/v1/network/**",
+                                                "/api/v1/network/docs/**",
+                                                "/api/v1/network/internal/docs/**")
+
+                                                .uri("lb://networking"))
                                 // =================================================
                                 // FARGATe SERVICE
                                 // =================================================
