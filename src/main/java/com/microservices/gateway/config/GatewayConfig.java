@@ -121,7 +121,7 @@ public class GatewayConfig {
                                                 "/api/v1/network/docs/**",
                                                 "/api/v1/network/internal/docs/**")
 
-                                                .uri("lb://networking"))
+                                                .uri("lb://network-service"))
                                 // =================================================
                                 // FARGATe SERVICE
                                 // =================================================
