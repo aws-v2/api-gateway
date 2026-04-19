@@ -113,6 +113,15 @@ public class GatewayConfig {
                                                 .path("/api/v1/identity/**")
 
                                                 .uri("lb://iam"))
+ // =================================================
+                                // METRICS SERVICE
+                                // =================================================
+
+                                .route("metrics-docs", r -> r
+                                                .path("/api/v1/metrics/docs/**",
+                                                "/api/v1/metrics/internal/docs/**")
+
+                                                .uri("lb://metrics-service"))
                   // =================================================
                                 // Networking docs
                                 // =================================================
