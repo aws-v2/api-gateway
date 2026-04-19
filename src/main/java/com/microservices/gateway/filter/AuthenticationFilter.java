@@ -27,11 +27,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @Autowired
     private com.microservices.gateway.service.NatsService natsService;
 
-
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    // List of public endpoints that don't require auth
+    // Public endpoints — no JWT required
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            // ── Auth ──────────────────────────────────────────────────────────
             "/api/v1/auth/login",
             "/api/v1/auth/register",
             "/api/v1/auth/verify",
@@ -40,25 +40,52 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/api/v1/auth/resend-verification",
             "/api/v1/auth/reset-password",
             "/api/v1/auth/forgot-password",
-            "/auth/login",
-            "/auth/register",
-            "/auth/verify",
-            "/auth/mfa/verify",
-            "/auth/verify-email",
-            "/auth/resend-verification",
-            "/auth/reset-password",
-            "/auth/forgot-password");
+
+            // ── Public Docs (all services) — no trailing /** won't match base ─
+            "/api/v1/auth/docs",
+            "/api/v1/auth/docs/**",
+            "/api/v1/ec2/docs",
+            "/api/v1/ec2/docs/**",
+            "/api/v1/lambda/docs",
+            "/api/v1/lambda/docs/**",
+            "/api/v1/rds/docs",
+            "/api/v1/rds/docs/**",
+            "/api/v1/identity/docs",
+            "/api/v1/identity/docs/**",
+            "/api/v1/gamelift/docs",
+            "/api/v1/gamelift/docs/**",
+            "/api/v1/fargate/docs",
+            "/api/v1/fargate/docs/**",
+            "/api/v1/api-gateway/docs",
+            "/api/v1/api-gateway/docs/**",
+            "/api/v1/sagemaker/docs",
+            "/api/v1/sagemaker/docs/**",
+            "/api/v1/network/docs",
+            "/api/v1/network/docs/**",
+            "/api/v1/metrics/docs",
+            "/api/v1/metrics/docs/**",
+            "/api/v1/s3/docs",
+            "/api/v1/s3/docs/**",
+            "/api/v1/config/docs",
+            "/api/v1/config/docs/**",
+            "/api/v1/gateway/docs",
+            "/api/v1/gateway/docs/**",
+            "/api/v1/billing/docs",
+            "/api/v1/billing/docs/**"
+
+            // NOTE: /internal/docs/** is intentionally excluded — JWT required
+    );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        // 1. Allow public endpoints
+        // 1. Allow public endpoints through without any auth check
         if (isPublicEndpoint(path)) {
             return chain.filter(exchange);
         }
 
-        // 2. Extract Token (Authorization Header or Query Param)
+        // 2. Extract token — Authorization header first, then query param (WebSocket fallback)
         String extractedToken = null;
         if (exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
@@ -66,27 +93,30 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 extractedToken = authHeader.substring(7);
             }
         } else {
-            // Fallback for WebSockets: check for 'token' query parameter
             extractedToken = exchange.getRequest().getQueryParams().getFirst("token");
         }
 
         final String token = extractedToken;
-        if (token != null) {
-            // Validate Signature (Stateless)
-            if (!jwtUtil.isTokenValid(token)) {
-                return failAuth(exchange, path, "JWT_SIGNATURE");
-            }
 
-            // Valid Token: Extract Claims & Forward
-            String userId = jwtUtil.extractUserId(token);
-            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                    .header("X-User-Id", userId)
-                    .build();
-            return chain.filter(exchange.mutate().request(mutatedRequest).build());
+        if (token == null) {
+            return failAuth(exchange, path, "MISSING_CREDENTIALS");
         }
 
-        // 3. No Auth Header found
-        return failAuth(exchange, path, "MISSING_CREDENTIALS");
+        // 3. Validate signature
+        if (!jwtUtil.isTokenValid(token)) {
+            return failAuth(exchange, path, "JWT_SIGNATURE");
+        }
+
+        // 4. Forward with user context headers
+        String userId = jwtUtil.extractUserId(token);
+        String role   = jwtUtil.extractRole(token);
+
+        ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                .header("X-User-Id", userId)
+                .header("X-User-Role", role)   // ← downstream services can use this
+                .build();
+
+        return chain.filter(exchange.mutate().request(mutatedRequest).build());
     }
 
     private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
@@ -96,7 +126,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
         }
 
-        log.warn("Auth failed: {} for path: {} from IP: {}", type, path, clientIp);
+        log.warn("Auth failed: {} | path: {} | ip: {}", type, path, clientIp);
+
         natsService.publish("auth", "failure", java.util.Map.of(
                 "type", type,
                 "path", path,
@@ -109,11 +140,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicEndpoint(String path) {
         return PUBLIC_ENDPOINTS.stream()
-                .anyMatch(publicPath -> pathMatcher.match(publicPath, path));
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
     @Override
     public int getOrder() {
-        return -1; // Execute early in the chain
+        return -1;
     }
 }

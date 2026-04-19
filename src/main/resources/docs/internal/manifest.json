@@ -1,0 +1,23 @@
+{
+  "service": "gateway-server",
+  "version": "1.0.0",
+  "type": "internal",
+  "title": "Config Server Internal Documentation",
+  "description": "Internal engineering documentation for Config Server service",
+  "categories": [
+    {
+      "title": "System Architecture",
+      "items": [
+        { "title": "IAM Architecture Overview", "slug": "iam-architecture-overview" },
+        { "title": "Service Startup Lifecycle", "slug": "iam-startup-lifecycle" }
+      ]
+    },
+    {
+      "title": "Security & Access Control",
+      "items": [
+        { "title": "Authentication Flow", "slug": "iam-auth-flow" },
+        { "title": "Authorization Model", "slug": "iam-authz-model" }
+      ]
+    }
+  ]
+}

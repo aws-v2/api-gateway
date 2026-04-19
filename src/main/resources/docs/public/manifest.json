@@ -1,0 +1,20 @@
+{
+  "service": "Gateway Server",
+  "version": "V1",
+  "categories": [
+    {
+      "title": "Getting Started",
+      "items": [
+        { "title": "IAM Overview", "slug": "iam-overview" },
+        { "title": "Quickstart", "slug": "iam-quickstart" }
+      ]
+    },
+    {
+      "title": "Users & Authentication",
+      "items": [
+        { "title": "Users & Accounts", "slug": "iam-users" },
+        { "title": "API Keys & Tokens", "slug": "iam-api-keys" }
+      ]
+    }
+  ]
+}
