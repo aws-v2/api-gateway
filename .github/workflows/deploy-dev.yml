@@ -36,3 +36,29 @@ jobs:
           --title "Merge ${{ github.ref_name }} into staging" \
           --body "Automated PR created by GitHub Actions after successful CI on ${{ github.ref_name }}" \
           || echo "PR already exists or error occurred"
+
+
+
+
+  open-pr-to-main:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create PR dev → staging
+        run: |
+          # Check if PR already exists
+          if gh pr list --base staging --head dev --state open --json number | jq -e 'length > 0' > /dev/null; then
+            echo "PR already exists. Skipping..."
+          else
+            gh pr create \
+              --base staging \
+              --head dev \
+              --title "chore: promote dev → staging" \
+              --body "✅ All tests passed on dev. Auto-generated PR."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT}}
