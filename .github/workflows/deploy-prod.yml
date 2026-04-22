@@ -25,7 +25,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: qarani/api-gateway:latest
+          tags: qarani/api-gateway:prod
           build-args: |
             SPRING_PROFILES_ACTIVE=prod
 
@@ -36,16 +36,17 @@ jobs:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          passphrase: ${{ secrets.EC2_SSH_PASSPHRASE }}
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          passphrase: ${{ secrets.PROD_SSH_PASSPHRASE }}
           script: |
             echo "${{ secrets.API_GATEWAY_PROD_ENV }}" > /home/ubuntu/.api-gateway-prod.env
-            docker pull qarani/api-gateway:latest
+            docker network create aws-prod-network || true
+            docker pull qarani/api-gateway:prod
             docker stop api-gateway || true
             docker rm api-gateway || true
-            docker run -d --name api-gateway --network mini-aws-network --env-file /home/ubuntu/.api-gateway-prod.env -p 8080:8080 qarani/api-gateway:latest
+            docker run -d --name api-gateway --network aws-prod-network --env-file /home/ubuntu/.api-gateway-prod.env -p 8080:8080 qarani/api-gateway:prod
 
 
 
