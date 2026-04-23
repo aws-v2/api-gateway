@@ -18,7 +18,7 @@ public class CorsConfig {
         // ✅ FIX: remove "/login" — origins must NOT include paths
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://13.48.129.233:5173",
+                "http://localhost:5174",
                 "https://frontend-server-latest.onrender.com"
         ));
 
