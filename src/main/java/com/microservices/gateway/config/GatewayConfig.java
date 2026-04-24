@@ -253,14 +253,14 @@ public class GatewayConfig {
                                 // AI ORCHESTRATOR SERVICE
                                 // =================================================
 
-                                .route("ai-orchestrator", r -> r
+                                .route("llm-gateway", r -> r
                                                 .path(
-                                                                "/api/v1/jobs/**",
-                                                                "/api/v1/jobs")
+                                                                "/api/v1/llm/**",
+                                                                "/api/v1/llm")
                                                 .filters(f -> f
                                                                 .stripPrefix(0)
                                                                 .filter(jwtAuthenticationFilter))
-                                                .uri("lb://ai-orchestrator"))
+                                                .uri("lb://llm-gateway"))
 
                                 // =================================================
                                 // GAMELIFT SERVICE
