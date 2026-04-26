@@ -29,6 +29,7 @@ jobs:
   
   dev-build:
     runs-on: ubuntu-latest
+    needs: dev-test
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +53,7 @@ jobs:
             SPRING_PROFILES_ACTIVE=dev
 
   dev-open-pr-to-staging:
+    
     if: github.event_name == 'push'
     needs: dev-test
     runs-on: ubuntu-latest
