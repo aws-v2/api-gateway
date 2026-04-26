@@ -53,9 +53,8 @@ jobs:
             SPRING_PROFILES_ACTIVE=dev
 
   dev-open-pr-to-staging:
-    
     if: github.event_name == 'push'
-    needs: dev-test
+    needs: dev-build
     runs-on: ubuntu-latest
 
     steps:
