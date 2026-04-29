@@ -82,7 +82,7 @@ jobs:
             docker service rm api-gateway-prod || true
 
             echo "Deploying API Gateway on akamai-localhost-vm or gateway node..."
-
+            
             docker service create \
               --name api-gateway-prod \
               --network prod-overlay-net \
