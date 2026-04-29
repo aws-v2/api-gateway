@@ -39,7 +39,15 @@ eureka:
   instance:
     prefer-ip-address: true
 
+eureka:
+  client:
+    service-url:
+      defaultZone: ${PROD_EUREKA_URL:http://discovery-server-prod:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
 
+  instance:
+    prefer-ip-address: false
 
 management:
   endpoints:
