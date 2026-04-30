@@ -45,11 +45,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
-
-logging:
+        include: health,info,metrics,env,refresh
+  endpoint:
+    health:
+      show-details: always
   level:
-    root: INFO
-    "[com.netflix.eureka]": INFO
-    "[com.netflix.discovery]": INFO
-
+    root: DEBUG
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: DEBUG
+    reactor.netty: DEBUG
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
