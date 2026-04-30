@@ -1,8 +1,0 @@
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/config/CorsConfigTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/config/GatewayConfigTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/filter/AdminRoleFilterTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/filter/AuthenticationFilterTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/filter/JwtAuthenticationFilterTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/service/NatsListenerTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/service/NatsServiceTest.java
-/home/martin/Documents/aws-v4/dev/api-gateway/src/test/java/com/microservices/gateway/util/JwtUtilTest.java

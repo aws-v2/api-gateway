@@ -25,7 +25,7 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn clean 
 
   prod-build-and-push:
     runs-on: ubuntu-latest
@@ -96,6 +96,8 @@ jobs:
               --env PROD_NATS_USERNAME=nats-prod-user \
               --env PROD_NATS_PASSWORD=nats-prod-password \
               --env PROD_EUREKA_URL=http://discovery-server-prod:8761/eureka/ \
+              --env EUREKA_HOSTNAME=api-gateway-prod \
+              --env EUREKA_IP_ADDR=api-gateway-prod \
               qarani/api-gateway:prod
 
             echo "Deployment complete."

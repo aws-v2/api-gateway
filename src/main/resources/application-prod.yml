@@ -21,6 +21,11 @@ nats:
 
 spring:
   cloud:
+    inetutils:
+      use-only-site-local-interfaces: true
+      ignored-interfaces:
+        - docker0
+        - veth.*
     gateway:
       discovery:
         locator:
@@ -38,17 +43,21 @@ eureka:
     register-with-eureka: true
 
   instance:
-    prefer-ip-address: false
-
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+    hostname: ${EUREKA_HOSTNAME:api-gateway-prod}
 management:
   endpoints:
     web:
       exposure:
-        include: refresh
-
-logging:
+        include: health,info,metrics,env,refresh
+  endpoint:
+    health:
+      show-details: always
   level:
-    root: INFO
-    "[com.netflix.eureka]": INFO
-    "[com.netflix.discovery]": INFO
-
+    root: DEBUG
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: DEBUG
+    reactor.netty: DEBUG
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG

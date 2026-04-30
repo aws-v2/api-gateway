@@ -1,5 +1,6 @@
 package com.microservices.gateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,15 +12,36 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+        @Value("${spring.profiles.active}")
+        private String profile;
+
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
+
+        if (profile.equals("dev")) {
+            config.setAllowedOrigins(List.of(
+                    "http://localhost:5173",
+                    "http://localhost:5174"));
+        } else if (profile.equals("staging")) {
+            config.setAllowedOrigins(List.of(
+                    "http://localhost:5173",
+                    "http://localhost:5174",
+                    "http://139.144.169.155:5173",
+                    "http://139.144.169.155:5174"));
+        } else if (profile.equals("prod")) {
+            config.setAllowedOrigins(List.of(
+                    "http://139.144.169.155:5173",
+                    "http://139.144.169.155:5174"));
+        }
 
         // ✅ FIX: remove "/login" — origins must NOT include paths
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
-                "https://frontend-server-latest.onrender.com"
+                "http://139.144.169.155:5173",
+                "http://139.144.169.155:5174"
+
         ));
 
         config.setAllowedMethods(List.of(
