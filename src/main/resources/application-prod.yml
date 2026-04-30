@@ -21,6 +21,11 @@ nats:
 
 spring:
   cloud:
+    inetutils:
+      use-only-site-local-interfaces: true
+      ignored-interfaces:
+        - docker0
+        - veth.*
     gateway:
       discovery:
         locator:
