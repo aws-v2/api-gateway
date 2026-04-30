@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-        @Value("${sping.profiles.active}")
+        @Value("${spring.profiles.active}")
         private String profile;
 
     @Bean
