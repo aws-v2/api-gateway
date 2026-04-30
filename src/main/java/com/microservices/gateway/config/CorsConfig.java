@@ -19,6 +19,9 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
+                "http://139.144.169.155:5173",
+                "http://139.144.169.155:5174",
+
                 "https://frontend-server-latest.onrender.com"
         ));
 

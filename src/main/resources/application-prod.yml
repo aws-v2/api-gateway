@@ -39,7 +39,9 @@ eureka:
 
   instance:
     prefer-ip-address: false
-
+    instance-id: ${spring.application.name}:${random.value}
+    hostname: ${EUREKA_HOSTNAME:api-gateway-prod}
+    hostname: ${EUREKA_HOSTNAME:api-gateway-prod}
 management:
   endpoints:
     web:
