@@ -29,17 +29,16 @@ spring:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
+
 eureka:
   client:
     service-url:
-      defaultZone: ${PROD_EUREKA_URL}
+      defaultZone: ${PROD_EUREKA_URL:http://discovery-server-prod:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
-    registry-fetch-interval-seconds: 30
+
   instance:
-    prefer-ip-address: true
-
-
+    prefer-ip-address: false
 
 management:
   endpoints:
