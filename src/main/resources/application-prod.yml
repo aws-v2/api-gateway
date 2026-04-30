@@ -38,7 +38,7 @@ eureka:
     register-with-eureka: true
 
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
     hostname: ${EUREKA_HOSTNAME:api-gateway-prod}
 management:
