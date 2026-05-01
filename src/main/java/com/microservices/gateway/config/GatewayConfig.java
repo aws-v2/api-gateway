@@ -258,8 +258,7 @@ public class GatewayConfig {
                                 "/api/v1/llm/**",
                                 "/api/v1/llm")
                         .filters(f -> f
-                                .stripPrefix(0)
-                                .filter(jwtAuthenticationFilter))
+                                .stripPrefix(0))
                         .uri("lb://llm-gateway"))
 
                 // =================================================
