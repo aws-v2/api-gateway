@@ -15,60 +15,62 @@ public class CorsConfig {
         @Value("${spring.profiles.active}")
         private String profile;
 
-    @Bean
-    public CorsWebFilter corsWebFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+        @Bean
+        public CorsWebFilter corsWebFilter() {
+                CorsConfiguration config = new CorsConfiguration();
 
-        if (profile.equals("dev")) {
-            config.setAllowedOrigins(List.of(
-                    "http://localhost:5173",
-                    "http://localhost:5174"));
-        } else if (profile.equals("staging")) {
-            config.setAllowedOrigins(List.of(
-                    "http://localhost:5173",
-                    "http://localhost:5174",
-                    "http://139.144.169.155:5173",
-                    "http://139.144.169.155:5174"));
-        } else if (profile.equals("prod")) {
-            config.setAllowedOrigins(List.of(
-                    "http://139.144.169.155:5173",
-                    "http://139.144.169.155:5174"));
+                if (profile.equals("dev")) {
+                        config.setAllowedOrigins(List.of(
+                                        "http://localhost:5173",
+                                        "http://localhost:5174"));
+                } else if (profile.equals("staging")) {
+                        config.setAllowedOrigins(List.of(
+                                        "http://localhost:5173",
+                                        "http://localhost:5174",
+                                        "http://139.144.169.155:5173",
+                                        "http://139.144.169.155:5174",
+                                        "http://100.66.1.98:5173",
+                                        "http://100.66.1.98:5174",
+                                        "http://[fd7a:115c:a1e0::7a01:1c4]:5173",
+                                        "http://[fd7a:115c:a1e0::7a01:1c4]:5174"));
+                } else if (profile.equals("prod")) {
+                        config.setAllowedOrigins(List.of(
+                                        "http://139.144.169.155:5173",
+                                        "http://139.144.169.155:5174"));
+                }
+
+                // ✅ FIX: remove "/login" — origins must NOT include paths
+                config.setAllowedOrigins(List.of(
+                                "http://localhost:5173",
+                                "http://localhost:5174",
+                                "http://139.144.169.155:5173",
+                                "http://139.144.169.155:5174"
+
+                ));
+
+                config.setAllowedMethods(List.of(
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "DELETE",
+                                "OPTIONS",
+                                "PATCH"));
+
+                config.setAllowedHeaders(List.of("*"));
+
+                // ⚠️ safer than exposing everything unless you really need it
+                config.setExposedHeaders(List.of(
+                                "Authorization",
+                                "Content-Type"));
+
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+                // ✅ Apply to ALL gateway routes
+                source.registerCorsConfiguration("/**", config);
+
+                return new CorsWebFilter(source);
         }
-
-        // ✅ FIX: remove "/login" — origins must NOT include paths
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://139.144.169.155:5173",
-                "http://139.144.169.155:5174"
-
-        ));
-
-        config.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS",
-                "PATCH"
-        ));
-
-        config.setAllowedHeaders(List.of("*"));
-
-        // ⚠️ safer than exposing everything unless you really need it
-        config.setExposedHeaders(List.of(
-                "Authorization",
-                "Content-Type"
-        ));
-
-        config.setAllowCredentials(true);
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        // ✅ Apply to ALL gateway routes
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsWebFilter(source);
-    }
 }

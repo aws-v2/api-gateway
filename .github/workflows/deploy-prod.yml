@@ -48,7 +48,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: qarani/api-gateway:prod
+          tags: |
+            qarani/api-gateway:prod
+            qarani/api-gateway:prod-${{ github.sha }}
           build-args: |
             SPRING_PROFILES_ACTIVE=prod
 
@@ -73,10 +75,10 @@ jobs:
           script: |
             set -e
             echo "Creating overlay network (if not exists)..."
-            docker network create --driver overlay prod-overlay-net || true
+            docker network create --driver overlay aws-prod-network || true
 
             echo "Pulling latest image..."
-            docker pull qarani/api-gateway:prod
+            docker pull qarani/api-gateway:prod-${{ github.sha }}
 
             echo "Removing old service..."
             docker service rm api-gateway-prod || true
@@ -95,9 +97,10 @@ jobs:
               --env PROD_NATS_URL=nats://nats-prod:4222 \
               --env PROD_NATS_USERNAME=nats-prod-user \
               --env PROD_NATS_PASSWORD=nats-prod-password \
+              --env PROD_API_KEY_SECRET=your-strong-random-secret-here \
               --env PROD_EUREKA_URL=http://discovery-server-prod:8761/eureka/ \
               --env EUREKA_HOSTNAME=api-gateway-prod \
               --env EUREKA_IP_ADDR=api-gateway-prod \
-              qarani/api-gateway:prod
+              qarani/api-gateway:prod-${{ github.sha }}
 
             echo "Deployment complete."
