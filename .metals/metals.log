@@ -368,3 +368,15 @@ org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Request window/showMessageRequ
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
 	at java.lang.Thread.run(Thread.java:840)
 
+2026.05.03 15:09:58 INFO  Started: Metals version 1.6.7 in folders '/home/martin/Documents/aws-v4/dev/api-gateway' for client Visual Studio Code 1.117.0.
+2026.05.03 15:09:58 INFO  time: initialize in 0.14s
+2026.05.03 15:09:58 INFO  Memory monitor started
+2026.05.03 15:09:59 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.05.03 15:09:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:10:01 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+May 03, 2026 3:10:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 2
+2026.05.03 15:10:01 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:10:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+May 03, 2026 3:10:02 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 3

@@ -3,7 +3,8 @@ server:
 
 api:
   version: ${PROD_API_VERSION}
-
+  key:
+    secret: ${PROD_API_KEY_SECRET:your-strong-random-secret-here}
 frontend:
   url: ${PROD_FRONTEND_URL}
 
@@ -61,3 +62,5 @@ management:
     reactor.netty: DEBUG
     com.netflix.discovery: DEBUG
     org.springframework.cloud.loadbalancer: DEBUG
+
+

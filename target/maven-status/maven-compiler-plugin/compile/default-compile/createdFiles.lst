@@ -9,7 +9,6 @@ com/microservices/gateway/util/JwtUtil.class
 com/microservices/gateway/dto/DocResponse.class
 com/microservices/gateway/filter/AdminRoleFilter.class
 com/microservices/gateway/filter/JwtAuthenticationFilter.class
-com/microservices/gateway/filter/AuthenticationFilter.class
 com/microservices/gateway/config/SecurityConfig.class
 com/microservices/gateway/service/DocsService.class
 com/microservices/gateway/enums/DocType.class

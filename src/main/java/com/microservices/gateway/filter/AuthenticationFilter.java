@@ -29,9 +29,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    // Public endpoints — no JWT required
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            // ── Auth ──────────────────────────────────────────────────────────
             "/api/v1/auth/login",
             "/api/v1/auth/register",
             "/api/v1/auth/verify",
@@ -40,80 +38,63 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/api/v1/auth/resend-verification",
             "/api/v1/auth/reset-password",
             "/api/v1/auth/forgot-password",
-
-            // ── Public Docs (all services) — no trailing /** won't match base ─
-            "/api/v1/auth/docs",
-            "/api/v1/auth/docs/**",
-            "/api/v1/ec2/docs",
-            "/api/v1/ec2/docs/**",
-            "/api/v1/lambda/docs",
-            "/api/v1/lambda/docs/**",
-            "/api/v1/rds/docs",
-            "/api/v1/rds/docs/**",
-            "/api/v1/identity/docs",
-            "/api/v1/identity/docs/**",
-            "/api/v1/gamelift/docs",
-            "/api/v1/gamelift/docs/**",
-            "/api/v1/fargate/docs",
-            "/api/v1/fargate/docs/**",
-            "/api/v1/api-gateway/docs",
-            "/api/v1/api-gateway/docs/**",
-            "/api/v1/sagemaker/docs",
-            "/api/v1/sagemaker/docs/**",
-            "/api/v1/network/docs",
-            "/api/v1/network/docs/**",
-            "/api/v1/metrics/docs",
-            "/api/v1/metrics/docs/**",
-            "/api/v1/s3/docs",
-            "/api/v1/s3/docs/**",
-            "/api/v1/config/docs",
-            "/api/v1/config/docs/**",
-            "/api/v1/gateway/docs",
-            "/api/v1/gateway/docs/**",
-            "/api/v1/billing/docs",
-            "/api/v1/billing/docs/**"
-
-            // NOTE: /internal/docs/** is intentionally excluded — JWT required
+            "/api/v1/auth/docs",          "/api/v1/auth/docs/**",
+            "/api/v1/ec2/docs",           "/api/v1/ec2/docs/**",
+            "/api/v1/lambda/docs",        "/api/v1/lambda/docs/**",
+            "/api/v1/rds/docs",           "/api/v1/rds/docs/**",
+            "/api/v1/identity/docs",      "/api/v1/identity/docs/**",
+            "/api/v1/gamelift/docs",      "/api/v1/gamelift/docs/**",
+            "/api/v1/fargate/docs",       "/api/v1/fargate/docs/**",
+            "/api/v1/api-gateway/docs",   "/api/v1/api-gateway/docs/**",
+            "/api/v1/sagemaker/docs",     "/api/v1/sagemaker/docs/**",
+            "/api/v1/network/docs",       "/api/v1/network/docs/**",
+            "/api/v1/metrics/docs",       "/api/v1/metrics/docs/**",
+            "/api/v1/s3/docs",            "/api/v1/s3/docs/**",
+            "/api/v1/config/docs",        "/api/v1/config/docs/**",
+            "/api/v1/gateway/docs",       "/api/v1/gateway/docs/**",
+            "/api/v1/billing/docs",       "/api/v1/billing/docs/**"
     );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        // 1. Allow public endpoints through without any auth check
+        // 1. Public endpoints — no auth
         if (isPublicEndpoint(path)) {
             return chain.filter(exchange);
         }
 
-        // 2. Extract token — Authorization header first, then query param (WebSocket fallback)
-        String extractedToken = null;
-        if (exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-            String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                extractedToken = authHeader.substring(7);
-            }
-        } else {
-            extractedToken = exchange.getRequest().getQueryParams().getFirst("token");
-        }
+        // 2. Extract token — Bearer header first, then ?token= query param (WebSocket fallback)
+        String token       = null;
+        String authMethod  = "jwt";
 
-        final String token = extractedToken;
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        } else {
+            token = exchange.getRequest().getQueryParams().getFirst("token");
+        }
 
         if (token == null) {
             return failAuth(exchange, path, "MISSING_CREDENTIALS");
         }
 
-        // 3. Validate signature
+        // 3. Validate
         if (!jwtUtil.isTokenValid(token)) {
             return failAuth(exchange, path, "JWT_SIGNATURE");
         }
 
-        // 4. Forward with user context headers
+        // 4. Extract claims
         String userId = jwtUtil.extractUserId(token);
         String role   = jwtUtil.extractRole(token);
 
+        log.info("[auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
+
+        // 5. Forward user context downstream
         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                .header("X-User-Id", userId)
-                .header("X-User-Role", role)   // ← downstream services can use this
+                .header("X-User-Id",     userId)
+                .header("X-User-Role",   role)
+                .header("X-Auth-Method", authMethod)
                 .build();
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build());
@@ -129,9 +110,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         log.warn("Auth failed: {} | path: {} | ip: {}", type, path, clientIp);
 
         natsService.publish("auth", "failure", java.util.Map.of(
-                "type", type,
-                "path", path,
-                "ip", clientIp,
+                "type",      type,
+                "path",      path,
+                "ip",        clientIp,
                 "timestamp", java.time.LocalDateTime.now().toString()));
 
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

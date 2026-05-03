@@ -3,7 +3,8 @@ server:
 
 api:
   version: ${DEV_API_VERSION:/api/v1}
-
+  key:
+    secret: ${DEV_API_KEY_SECRET:your-strong-random-secret-here}
 frontend:
   url: ${DEV_FRONTEND_URL:http://localhost:5173}
 
@@ -59,3 +60,5 @@ management:
     reactor.netty: DEBUG
     com.netflix.discovery: DEBUG
     org.springframework.cloud.loadbalancer: DEBUG
+
+

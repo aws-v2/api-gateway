@@ -87,6 +87,7 @@ jobs:
               -e STAGING_NATS_URL=nats://nats-staging:4222 \
               -e STAGING_NATS_USERNAME=nats-staging-user \
               -e STAGING_NATS_PASSWORD=nats-staging-password \
+              -e STAGING_API_KEY_SECRET=your-strong-random-secret-here \
               -e STAGING_EUREKA_URL=http://discovery-server-staging:8761/eureka/ \
               qarani/api-gateway:staging
 
