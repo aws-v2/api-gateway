@@ -107,7 +107,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
         }
 
-        log.warn("Auth failed: {} | path: {} | ip: {}", type, path, clientIp);
+        log.warn("Auth failed: {} | ,,path: {} | ip: {}", type, path, clientIp);
 
         natsService.publish("auth", "failure", java.util.Map.of(
                 "type",      type,
