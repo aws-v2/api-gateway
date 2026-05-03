@@ -48,8 +48,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: qarani/api-gateway:prod
-          tags: qarani/api-gateway:prod-${{ github.sha }}
+          tags: |
+            qarani/api-gateway:prod
+            qarani/api-gateway:prod-${{ github.sha }}
           build-args: |
             SPRING_PROFILES_ACTIVE=prod
 
