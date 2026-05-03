@@ -50,6 +50,7 @@ jobs:
         context: .
         push: true
         tags: qarani/api-gateway:staging
+        tags: qarani/api-gateway:staging-${{ github.sha }}
         build-args: |
           SPRING_PROFILES_ACTIVE=staging
 
@@ -72,7 +73,7 @@ jobs:
           username: ${{ secrets.STAGING_USERNAME }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            docker pull qarani/api-gateway:staging
+            docker pull qarani/api-gateway:staging-${{ github.sha }}
             docker stop api-gateway-staging || true
             docker rm api-gateway-staging || true
             docker run -d \
@@ -89,7 +90,7 @@ jobs:
               -e STAGING_NATS_PASSWORD=nats-staging-password \
               -e STAGING_API_KEY_SECRET=your-strong-random-secret-here \
               -e STAGING_EUREKA_URL=http://discovery-server-staging:8761/eureka/ \
-              qarani/api-gateway:staging
+              qarani/api-gateway:staging-${{ github.sha }}
 
   staging-open-pr-to-main:
     if: github.event_name == 'push'

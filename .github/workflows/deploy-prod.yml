@@ -49,6 +49,7 @@ jobs:
           context: .
           push: true
           tags: qarani/api-gateway:prod
+          tags: qarani/api-gateway:prod-${{ github.sha }}
           build-args: |
             SPRING_PROFILES_ACTIVE=prod
 
@@ -76,7 +77,7 @@ jobs:
             docker network create --driver overlay prod-overlay-net || true
 
             echo "Pulling latest image..."
-            docker pull qarani/api-gateway:prod
+            docker pull qarani/api-gateway:prod-${{ github.sha }}
 
             echo "Removing old service..."
             docker service rm api-gateway-prod || true
@@ -99,6 +100,6 @@ jobs:
               --env PROD_EUREKA_URL=http://discovery-server-prod:8761/eureka/ \
               --env EUREKA_HOSTNAME=api-gateway-prod \
               --env EUREKA_IP_ADDR=api-gateway-prod \
-              qarani/api-gateway:prod
+              qarani/api-gateway:prod-${{ github.sha }}
 
             echo "Deployment complete."
