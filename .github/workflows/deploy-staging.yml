@@ -73,6 +73,8 @@ jobs:
           username: ${{ secrets.STAGING_USERNAME }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
+            docker network create aws-staging-network || true
+
             docker pull qarani/api-gateway:staging-${{ github.sha }}
             docker stop api-gateway-staging || true
             docker rm api-gateway-staging || true

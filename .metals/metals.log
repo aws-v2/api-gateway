@@ -408,3 +408,11 @@ WARNING: Unmatched cancel notification for request id 26
 2026.05.03 15:32:24 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
 2026.05.03 15:35:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
 2026.05.03 15:35:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:45:55 INFO  Started: Metals version 1.6.7 in folders '/home/martin/Documents/aws-v4/dev/api-gateway' for client Visual Studio Code 1.117.0.
+2026.05.03 15:45:55 INFO  Memory monitor started
+2026.05.03 15:45:57 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.05.03 15:45:58 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:51:57 WARN  no build target for: /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.05.03 15:51:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+May 03, 2026 3:55:07 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
