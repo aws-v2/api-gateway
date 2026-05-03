@@ -406,3 +406,5 @@ WARNING: Unmatched cancel notification for request id 26
 2026.05.03 15:32:11 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
 2026.05.03 15:32:16 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
 2026.05.03 15:32:24 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:35:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.05.03 15:35:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
