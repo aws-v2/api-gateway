@@ -17,6 +17,9 @@ nats:
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
 
+
+
+spring:
   cloud:
     gateway:
       discovery:
@@ -26,6 +29,35 @@ nats:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
+
+    inetutils:
+      use-only-site-local-interfaces: true
+      ignored-interfaces:
+        - docker0
+        - veth.*
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+
+
+ 
 eureka:
   instance:
     prefer-ip-address: true

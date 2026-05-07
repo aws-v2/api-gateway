@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,12 @@ public class JwtAuthenticationFilter implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
+
+
+        if (request.getMethod() == HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+        
         // ── Public paths — skip auth entirely ────────────────────────────────
         if (isPublicDocsPath(path)) {
             return chain.filter(exchange);

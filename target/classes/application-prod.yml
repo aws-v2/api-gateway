@@ -22,6 +22,26 @@ nats:
 
 spring:
   cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
+
     inetutils:
       use-only-site-local-interfaces: true
       ignored-interfaces:
