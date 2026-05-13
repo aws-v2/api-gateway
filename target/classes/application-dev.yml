@@ -9,7 +9,7 @@ frontend:
   url: ${DEV_FRONTEND_URL:http://localhost:5173}
 
 jwt:
-  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  secret: ${DEV_JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration: 86400000
   
 nats:
@@ -17,6 +17,11 @@ nats:
   username: ${DEV_NATS_USERNAME:auth-server}
   password: ${DEV_NATS_PASSWORD:auth-secret}
 
+
+app:
+  tailscale:
+    ips: 100.66.1.98,100.71.223.121,100.74.77.12
+spring:
   cloud:
     gateway:
       discovery:
@@ -26,6 +31,35 @@ nats:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
+
+    inetutils:
+      use-only-site-local-interfaces: true
+      ignored-interfaces:
+        - docker0
+        - veth.*
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+
+
+ 
 eureka:
   instance:
     prefer-ip-address: true

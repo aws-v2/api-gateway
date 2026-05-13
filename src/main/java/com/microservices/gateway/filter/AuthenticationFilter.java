@@ -16,6 +16,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import com.microservices.gateway.util.*;
 
 @Component
 @Slf4j
@@ -55,50 +56,117 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/api/v1/billing/docs",       "/api/v1/billing/docs/**"
     );
 
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String path = exchange.getRequest().getURI().getPath();
 
-        // 1. Public endpoints — no auth
-        if (isPublicEndpoint(path)) {
-            return chain.filter(exchange);
-        }
+@Override
+public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    String path = exchange.getRequest().getURI().getPath();
 
-        // 2. Extract token — Bearer header first, then ?token= query param (WebSocket fallback)
-        String token       = null;
-        String authMethod  = "jwt";
-
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-        } else {
-            token = exchange.getRequest().getQueryParams().getFirst("token");
-        }
-
-        if (token == null) {
-            return failAuth(exchange, path, "MISSING_CREDENTIALS");
-        }
-
-        // 3. Validate
-        if (!jwtUtil.isTokenValid(token)) {
-            return failAuth(exchange, path, "JWT_SIGNATURE");
-        }
-
-        // 4. Extract claims
-        String userId = jwtUtil.extractUserId(token);
-        String role   = jwtUtil.extractRole(token);
-
-        log.info("[auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
-
-        // 5. Forward user context downstream
-        ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                .header("X-User-Id",     userId)
-                .header("X-User-Role",   role)
-                .header("X-Auth-Method", authMethod)
-                .build();
-
-        return chain.filter(exchange.mutate().request(mutatedRequest).build());
+    // 1. Public endpoints — no auth
+    if (isPublicEndpoint(path)) {
+        return chain.filter(exchange);
     }
+
+    String credential = null;
+    String authMethod = null;
+
+    // 2. Try Authorization: Bearer <token>
+    String authHeader = exchange.getRequest()
+            .getHeaders()
+            .getFirst(HttpHeaders.AUTHORIZATION);
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        credential = authHeader.substring(7).trim();
+        authMethod = "jwt";
+    }
+
+    // 3. Fallback to ?token=
+    if (credential == null || credential.isBlank()) {
+        String queryToken = exchange.getRequest()
+                .getQueryParams()
+                .getFirst("token");
+
+        if (queryToken != null && !queryToken.isBlank()) {
+            credential = queryToken.trim();
+            authMethod = "query";
+        }
+    }
+
+    // 4. Fallback to X-Api-Key
+    if (credential == null || credential.isBlank()) {
+        String apiKey = exchange.getRequest()
+                .getHeaders()
+                .getFirst("X-Api-Key");
+
+        if (apiKey != null && !apiKey.isBlank()) {
+            credential = apiKey.trim();
+            authMethod = "api-key";
+        }
+    }
+
+    // 5. No credentials found
+    if (credential == null || credential.isBlank()) {
+        return failAuth(exchange, path, "MISSING_CREDENTIALS");
+    }
+
+    String userId = null;
+    String role   = null;
+
+    // 6. Validate based on auth method
+    switch (authMethod) {
+
+        case "jwt":
+        case "query":
+
+            if (!jwtUtil.isTokenValid(credential)) {
+                return failAuth(exchange, path, "JWT_SIGNATURE");
+            }
+
+            userId = jwtUtil.extractUserId(credential);
+            role   = jwtUtil.extractRole(credential);
+
+            break;
+
+        case "api-key":
+
+   
+            // Replace with your actual validation logic
+            if (!jwtUtil.isApiKeyValid(credential)) {
+                return failAuth(exchange, path, "INVALID_API_KEY");
+            }
+
+            // Optional machine identity
+            userId = "agent";
+            role   = "SYSTEM";
+
+            break;
+
+        default:
+            return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
+    }
+
+    log.info(
+            "[auth] userId={} role={} method={} path={}",
+            userId,
+            role,
+            authMethod,
+            path
+    );
+
+    // 7. Forward auth context downstream
+    ServerHttpRequest mutatedRequest = exchange.getRequest()
+            .mutate()
+            .header("X-Auth-Method", authMethod)
+            .header("X-User-Id", userId != null ? userId : "")
+            .header("X-User-Role", role != null ? role : "")
+            .build();
+
+    return chain.filter(
+            exchange.mutate()
+                    .request(mutatedRequest)
+                    .build()
+    );
+}
+
 
     private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
         String clientIp = "unknown";

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,12 @@ public class JwtAuthenticationFilter implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
+
+
+        if (request.getMethod() == HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+        
         // ── Public paths — skip auth entirely ────────────────────────────────
         if (isPublicDocsPath(path)) {
             return chain.filter(exchange);
@@ -104,7 +111,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     private Mono<Void> handleApiKey(ServerWebExchange exchange, GatewayFilterChain chain,
                                      String apiKey, String path) {
         if (!jwtUtil.isApiKeyValid(apiKey)) {
-            log.warn("Auth failed: INVALID_API_KEY for path: {}", path);
+            log.warn("Auth failed: INVALID_API_KEY for path: {} and this key {}", path, apiKey);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
