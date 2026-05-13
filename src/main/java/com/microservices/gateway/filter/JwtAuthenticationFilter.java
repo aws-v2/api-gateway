@@ -111,7 +111,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     private Mono<Void> handleApiKey(ServerWebExchange exchange, GatewayFilterChain chain,
                                      String apiKey, String path) {
         if (!jwtUtil.isApiKeyValid(apiKey)) {
-            log.warn("Auth failed: INVALID_API_KEY for path: {}", path);
+            log.warn("Auth failed: INVALID_API_KEY for path: {} and this key {}", path, apiKey);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
