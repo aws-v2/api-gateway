@@ -235,6 +235,7 @@ public class GatewayConfig {
                                 "/api/v1/ec2/instances/**",
                                 "/api/v1/ec2/scaling-policies/**",
                                 "/api/v1/compute/docs/**",
+                                "/api/v1/compute/hosts/**",
                                 "/api/v1/compute/fleet/**",
                                 "/api/v1/compute/instances/**",
                                 "/api/v1/compute/**",
@@ -272,7 +273,14 @@ public class GatewayConfig {
                                 apiVersion + "/gamelift/docs/**")
                         .filters(f -> f.stripPrefix(0))
                         .uri("lb://gamelift-server"))
-
+// SSE route — must be BEFORE gamelift-http
+.route("gamelift-sse", r -> r
+        .path(apiVersion + "/gamelift/fleet/instances/*/events")
+        .filters(f -> f
+                .stripPrefix(0)
+                .removeResponseHeader("Content-Length")  // prevents gateway buffering
+                .filter(jwtAuthenticationFilter))
+        .uri("lb://gamelift-server"))
                 // Internal docs — JWT required
                 .route("gamelift-docs-internal", r -> r
                         .path(
