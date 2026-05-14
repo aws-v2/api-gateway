@@ -3,3 +3,11 @@ spring:
     name: api-gateway
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+
+
+
+  cloud:
+    gateway:
+      httpclient:
+        response-timeout: 3600s   # default is often 30s which kills SSE
+        connect-timeout: 5000
