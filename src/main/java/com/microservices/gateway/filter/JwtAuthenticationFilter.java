@@ -50,11 +50,16 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 
         // ── No Bearer — fall back to HMAC API key ────────────────────────────
         String apiKey = request.getHeaders().getFirst("X-Api-Key");
-
         if (apiKey != null && !apiKey.isBlank()) {
             return handleApiKey(exchange, chain, apiKey, path);
         }
+// ── SSE / EventSource fallback — token in query param ────────────────
+String queryToken = request.getQueryParams().getFirst("token");
+log.info("SSE token check — path: {}, token present: {}", path, queryToken != null);
 
+if (queryToken != null && !queryToken.isBlank()) {
+    return handleBearerToken(exchange, chain, queryToken, path);
+}
         // ── Nothing provided — reject ─────────────────────────────────────────
         log.warn("Auth failed: MISSING_CREDENT****IALS for path: {}", path);    
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
