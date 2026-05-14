@@ -18,7 +18,9 @@ nats:
   password: ${STAGING_NATS_PASSWORD:nats-staging-password}
 
 spring:
+
   cloud:
+  
     gateway:
       globalcors:
         add-to-simple-url-handler-mapping: true
@@ -37,8 +39,10 @@ spring:
               - "*"
             allowCredentials: true
             maxAge: 3600
-
-
+ 
+      httpclient:
+        response-timeout: 3600s   # default is often 30s which kills SSE
+        connect-timeout: 5000
       discovery:
         locator:
           enabled: true
