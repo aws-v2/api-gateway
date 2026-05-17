@@ -18,9 +18,7 @@ nats:
   password: ${STAGING_NATS_PASSWORD:nats-staging-password}
 
 spring:
-
   cloud:
-  
     gateway:
       globalcors:
         add-to-simple-url-handler-mapping: true
