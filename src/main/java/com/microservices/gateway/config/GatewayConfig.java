@@ -275,12 +275,17 @@ public class GatewayConfig {
                         .uri("lb://gamelift-server"))
 // SSE route — must be BEFORE gamelift-http
 .route("gamelift-sse", r -> r
-        .path(apiVersion + "/gamelift/fleet/instances/*/events")
-        .filters(f -> f
-                .stripPrefix(0)
-                .removeResponseHeader("Content-Length")  // prevents gateway buffering
-                .filter(jwtAuthenticationFilter))
-        .uri("lb://gamelift-server"))
+    .path(apiVersion + "/gamelift/fleet/instances/*/events")
+    .filters(f -> f
+        .stripPrefix(0)
+        .removeResponseHeader("Content-Length")
+        .addResponseHeader("X-Accel-Buffering", "no")
+        .addResponseHeader("Cache-Control", "no-cache")
+        .filter(jwtAuthenticationFilter))
+    .metadata("response-timeout", 3600000)  // 👈 1 hour in ms
+    .metadata("connect-timeout", 5000)
+    .uri("lb://gamelift-server"))
+
                 // Internal docs — JWT required
                 .route("gamelift-docs-internal", r -> r
                         .path(

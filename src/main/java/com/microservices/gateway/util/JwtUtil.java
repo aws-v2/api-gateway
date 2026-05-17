@@ -6,16 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.time.Instant;
 import java.util.Base64;
-import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.SecretKey;
@@ -26,23 +23,24 @@ public class JwtUtil {
 
     @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String secret;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String HMAC_ALGO = "HmacSHA256";
 
- 
-    @Value("${jwt.expiration:86400000}") // Default 24h
+    @Value("${jwt.expiration:86400000}")
     private long jwtExpiration;
 
-    public String generateToken(String username, java.util.UUID userId) {
+    private static final String HMAC_ALGO = "HmacSHA256";
+
+    // ── Internal record ───────────────────────────────────────────────────────────
+
+    private record ApiKeyPayload(String userId, String keyId, String role) {}
+
+    // ── JWT ───────────────────────────────────────────────────────────────────────
+
+    public String generateToken(String username, UUID userId) {
         java.util.Map<String, Object> claims = new java.util.HashMap<>();
         claims.put("userId", userId.toString());
-        return createToken(claims, username);
-    }
-
-    private String createToken(java.util.Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
-                .subject(subject)
+                .subject(username)
                 .issuedAt(new java.util.Date(System.currentTimeMillis()))
                 .expiration(new java.util.Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey())
@@ -50,16 +48,11 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
+        return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    public java.util.Date extractExpiration(String token) {
-        return extractAllClaims(token).getExpiration();
     }
 
     public String extractUsername(String token) {
@@ -74,6 +67,10 @@ public class JwtUtil {
         return extractAllClaims(token).get("userId", String.class);
     }
 
+    public java.util.Date extractExpiration(String token) {
+        return extractAllClaims(token).getExpiration();
+    }
+
     public boolean isTokenValid(String token) {
         try {
             extractAllClaims(token);
@@ -83,148 +80,119 @@ public class JwtUtil {
         }
     }
 
-    private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
     public String getTokenHash(String token) {
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             return org.apache.commons.codec.binary.Hex.encodeHexString(hash);
         } catch (Exception e) {
             throw new RuntimeException("Error hashing token", e);
         }
     }
 
-    public String generateApiKey(String userId) {
+    // ── API Key generation ────────────────────────────────────────────────────────
+
+    /**
+     * Generates an API key with format: ak_<base64(userId:keyId:role)>.<hmac>
+     */
+    public String generateApiKey(String userId, String role) {
         try {
-            String payload = MAPPER.writeValueAsString(Map.of(
-                    "userId", userId,
-                    "iat", Instant.now().getEpochSecond()));
-
-            String encodedPayload = Base64.getUrlEncoder()
-                    .withoutPadding()
-                    .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
-
-            String signature = hmacSign(encodedPayload);
-
-            return encodedPayload + "." + signature;
-
+            String raw     = userId + ":" + UUID.randomUUID() + ":" + role;
+            String encoded = Base64.getUrlEncoder().withoutPadding()
+                    .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+            return "ak_" + encoded + "." + hmacSign(encoded);
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate API key", e);
         }
     }
-@PostConstruct
-public void debugSecret() {
-    log.info("[SECRET CHECK] class={} length={} first8='{}' last8='{}'",
-        getClass().getSimpleName(),
-        secret.length(),
-        secret.substring(0, Math.min(8, secret.length())),
-        secret.substring(Math.max(0, secret.length() - 8))
-    );
-}
-    /**
-     * Validate the HMAC signature of the incoming API key.
-     * Returns false if the format is wrong or the signature doesn't match.
-     */
+
+    // ── API Key validation & extraction ──────────────────────────────────────────
+
     public boolean isApiKeyValid(String apiKey) {
-debugSecret();
-        log.info("Validating API key with this api keys {}", apiKey);
+        debugSecret();
+        return parseApiKey(apiKey) != null;
+    }
 
-        if (apiKey == null || !apiKey.contains("ak_")) {
-            return false;
-        }
-        log.info("Validating API key with this api keys1");
+    public String getUserId(String apiKey) {
+        debugSecret();
+        ApiKeyPayload p = parseApiKey(apiKey);
+        return p != null ? p.userId() : "unknown";
+    }
 
+    public String getUserRole(String apiKey) {
+        debugSecret();
+        ApiKeyPayload p = parseApiKey(apiKey);
+        return p != null ? p.role() : "unknown";
+    }
+
+    /** Skips signature revalidation — only call after isApiKeyValid() returns true. */
+    public String extractUserIdFromApiKey(String apiKey) {
+        ApiKeyPayload p = parseApiKey(apiKey);
+        return p != null ? p.userId() : null;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────────
+
+    /**
+     * Parses, validates HMAC signature, and decodes the API key payload.
+     * Returns null on any failure.
+     */
+    private ApiKeyPayload parseApiKey(String apiKey) {
+        if (apiKey == null || !apiKey.contains("ak_")) return null;
         try {
-
-            // split payload.signature
             int dotIdx = apiKey.lastIndexOf('.');
+            if (dotIdx < 0) return null;
 
-            String encodedPayload = apiKey.substring(0, dotIdx).replace("ak_", "");
+            String encodedPayload    = apiKey.substring(0, dotIdx).replace("ak_", "");
             String incomingSignature = apiKey.substring(dotIdx + 1);
-            log.info("this is the encoded payload {}", encodedPayload);
-            log.info("this is the incoming signature {}", incomingSignature);
 
-            // recompute signature
-            String expectedSignature = hmacSign(encodedPayload);
+            log.info("[API-KEY] encodedPayload={} incomingSignature={}", encodedPayload, incomingSignature);
 
-            // constant-time signature comparison
             boolean signatureValid = MessageDigest.isEqual(
                     incomingSignature.getBytes(StandardCharsets.UTF_8),
-                    expectedSignature.getBytes(StandardCharsets.UTF_8));
-            log.info("Validating API key with this api keys2");
+                    hmacSign(encodedPayload).getBytes(StandardCharsets.UTF_8));
 
             if (!signatureValid) {
-                log.warn("Invalid API key signature {}", apiKey);
-                return false;
-            }
-            log.info("Validating API key with this api keys3");
-
-            // decode payload
-            String decodedPayload = new String(
-                    Base64.getUrlDecoder().decode(encodedPayload),
-                    StandardCharsets.UTF_8);
-
-            // expected format: userId:keyId
-            String[] parts = decodedPayload.split(":");
-
-            if (parts.length != 2) {
-                log.warn("Invalid API key payload format");
-                return false;
+                log.warn("[API-KEY] Invalid signature for key={}", apiKey);
+                return null;
             }
 
-            String userId = parts[0];
-            String keyId = parts[1];
+            String decoded = new String(Base64.getUrlDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
+            String[] parts = decoded.split(":");
 
-            log.info("API key valid for userId={}, keyId={}", userId, keyId);
+            if (parts.length < 2) {
+                log.warn("[API-KEY] Invalid payload format decoded={}", decoded);
+                return null;
+            }
 
-            return true;
+            // backward compat: old keys are userId:keyId (2 parts), new keys are userId:keyId:role
+            String role = parts.length >= 3 ? parts[2] : "user";
+
+            log.info("[API-KEY] Parsed userId={} keyId={} role={}", parts[0], parts[1], role);
+            return new ApiKeyPayload(parts[0], parts[1], role);
 
         } catch (Exception e) {
-
-            log.error("API key validation failed: {}", e.getMessage());
-
-            return false;
-        }
-    }
-
-    /**
-     * Decode the payload and return the userId.
-     * Only call this after isApiKeyValid() returns true.
-     */
-    public String extractUserIdFromApiKey(String apiKey) {
-        try {
-            int dotIdx = apiKey.lastIndexOf('.');
-            String encodedPayload = apiKey.substring(0, dotIdx).replace("ak_", "");
-
-            String decodedPayload = new String(
-                    Base64.getUrlDecoder().decode(encodedPayload),
-                    StandardCharsets.UTF_8);
-
-            String[] parts = decodedPayload.split(":");
-            if (parts.length == 2) {
-                return parts[0];
-            }
-            return null;
-        } catch (Exception e) {
-            log.error("API key validation failed: {}", e.getMessage());
+            log.error("[API-KEY] Parse error: {}", e.getMessage());
             return null;
         }
     }
-
-    // ── Private helper — signs the payload with HMAC-SHA256 ──────────────────────
 
     private String hmacSign(String data) throws Exception {
         Mac mac = Mac.getInstance(HMAC_ALGO);
-        SecretKeySpec keySpec = new SecretKeySpec(
-                secret.getBytes(StandardCharsets.UTF_8),
-                HMAC_ALGO);
-        mac.init(keySpec);
-        byte[] sig = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(sig);
+        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGO));
+        return Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(mac.doFinal(data.getBytes(StandardCharsets.UTF_8)));
     }
 
+    private SecretKey getSignInKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    }
+
+    @PostConstruct
+    public void debugSecret() {
+        log.info("[SECRET] class={} length={} first8='{}' last8='{}'",
+                getClass().getSimpleName(), secret.length(),
+                secret.substring(0, Math.min(8, secret.length())),
+                secret.substring(Math.max(0, secret.length() - 8)));
+    }
 }
