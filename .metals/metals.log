@@ -433,3 +433,48 @@ org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Request window/showMessageRequ
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
 	at java.lang.Thread.run(Thread.java:840)
 
+2026.06.29 15:50:53 INFO  Started: Metals version 1.6.7 in folders '/home/martin/Documents/aws-v4/dev/api-gateway' for client Visual Studio Code 1.121.0.
+2026.06.29 15:50:53 INFO  Memory monitor started
+2026.06.29 15:50:55 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.06.29 15:50:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:50:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:56:06 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:56:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:56:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:56:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 15:58:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:01:31 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:02:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:04:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:06:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:07:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:07:49 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:10:03 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:10:25 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:12:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:13:15 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 16:55:51 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 17:13:54 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 17:15:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.06.29 18:29:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.07.01 07:12:59 INFO  Started: Metals version 1.6.7 in folders '/home/martin/Documents/aws-v4/dev/api-gateway' for client Visual Studio Code 1.121.0.
+2026.07.01 07:12:59 INFO  Memory monitor started
+2026.07.01 07:13:03 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.07.01 07:13:04 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.07.01 07:13:07 INFO  no build target found for /home/martin/Documents/aws-v4/dev/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.07.01 07:13:13 INFO  Shutting down server
+2026.07.01 07:13:13 INFO  Memory monitor stopped
+2026.07.01 07:13:13 INFO  shutting down Metals
+2026.07.01 07:13:13 ERROR Unexpected error initializing server: 
+org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Request window/showMessageRequest failed with message: Canceled
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.handleResponse(RemoteEndpoint.java:214)
+	at org.eclipse.lsp4j.jsonrpc.RemoteEndpoint.consume(RemoteEndpoint.java:198)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.handleMessage(StreamMessageProducer.java:189)
+	at org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer.listen(StreamMessageProducer.java:97)
+	at org.eclipse.lsp4j.jsonrpc.json.ConcurrentMessageProcessor.run(ConcurrentMessageProcessor.java:97)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(Thread.java:840)
+

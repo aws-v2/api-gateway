@@ -82,7 +82,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             String queryToken = exchange.getRequest()
                     .getQueryParams()
                     .getFirst("token");
-
             if (queryToken != null && !queryToken.isBlank()) {
                 credential = queryToken.trim();
                 authMethod = "query";
@@ -151,6 +150,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         ServerHttpRequest mutatedRequest = exchange.getRequest()
                 .mutate()
                 .header("X-Auth-Method", authMethod)
+                .header("X-Authorization", credential)
                 .header("X-User-Id", userId != null ? userId : "")
                 .header("X-User-Role", role != null ? role : "")
                 .build();
