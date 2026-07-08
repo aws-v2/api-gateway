@@ -88,6 +88,7 @@ public class GatewayConfig {
                                 "/api/v1/s3/docs/**",
                                 "/api/v1/s3/search/**",
                                 "/api/v1/s3/multipart/**",
+                                "/api/v1/s3/metrics/**",
                                 "/api/v1/s3/webhooks/**",
                                 "/api/v1/s3/security/**",
                                 "/api/v1/s3/health/**")
