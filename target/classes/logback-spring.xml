@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <appenders name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <file>logs/console.log</file>
+        <encoder>
+            <pattern>
+                %d{yyy-MM-dd HH:mm:dd}%n
+            </pattern>
+        </encoder>
+
+    </appenders>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
