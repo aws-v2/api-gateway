@@ -290,8 +290,8 @@ public class GatewayConfig {
                 // Internal docs — JWT required
                 .route("gamelift-docs-internal", r -> r
                         .path(
-                                apiVersion + "/gamelift/internal/docs",
-                                apiVersion + "/gamelift/internal/docs/**")
+                                apiVersion + "/gamelift/docs",
+                                apiVersion + "/gamelift/docs/**")
                         .filters(f -> f
                                 .stripPrefix(0)
                                 .filter(jwtAuthenticationFilter))

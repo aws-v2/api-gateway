@@ -131,6 +131,11 @@ public class JwtUtil {
         return p != null ? p.userId() : null;
     }
 
+    public String extractRoleFromApiKey(String apiKey) {
+        ApiKeyPayload p = parseApiKey(apiKey);
+        return p != null ? p.role() : null;
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────────
 
     /**
