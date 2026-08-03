@@ -3,7 +3,11 @@
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/config/GatewayConfig.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/config/SecurityConfig.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/controller/PublicDocsController.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocCategory.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocItem.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocManifest.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocResponse.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/Metadata.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/enums/DocType.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AdminRoleFilter.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
