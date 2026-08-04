@@ -36,7 +36,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 	private static final List<String> PUBLIC_ENDPOINTS = List.of(
 
-			"/api/v1/s3/health","/api/v1/gateway/health","/api/v1/s3/health", "/api/v1/ec2/health", "/api/v1/rds/health", "/api/v1/lambda/health",
+			"/api/v1/auth/health","/api/v1/gateway/health","/api/v1/s3/health", "/api/v1/ec2/health", "/api/v1/rds/health", "/api/v1/lambda/health",
 			"/api/v1/sagemaker/health", "/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/verify",
 			"/api/v1/auth/mfa/verify", "/api/v1/auth/verify-email", "/api/v1/auth/resend-verification",
 			"/api/v1/auth/reset-password", "/api/v1/auth/forgot-password", "/api/v1/auth/docs", "/api/v1/auth/docs/**",
