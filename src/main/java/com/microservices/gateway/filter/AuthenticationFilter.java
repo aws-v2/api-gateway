@@ -43,7 +43,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 			"/api/v1/ec2/docs", "/api/v1/ec2/docs/**", "/api/v1/lambda/docs", "/api/v1/lambda/docs/**",
 			"/api/v1/rds/docs", "/api/v1/rds/docs/**", "/api/v1/identity/docs", "/api/v1/identity/docs/**",
 			"/api/v1/gamelift/docs", "/api/v1/gamelift/docs/**", "/api/v1/fargate/docs", "/api/v1/fargate/docs/**",
-			"/api/v1/api-gateway/docs", "/api/v1/api-gateway/docs/**", "/api/v1/sagemaker/docs",
+			"/api/v1/gateway/docs", "/api/v1/gateway/docs/**", "/api/v1/sagemaker/docs",
 			"/api/v1/sagemaker/docs/**", "/api/v1/network/docs", "/api/v1/network/docs/**", "/api/v1/metrics/docs",
 			"/api/v1/metrics/docs/**", "/api/v1/s3/docs", "/api/v1/s3/docs/**", "/api/v1/config/docs",
 			"/api/v1/config/docs/**", "/api/v1/gateway/docs", "/api/v1/gateway/docs/**", "/api/v1/billing/docs",
