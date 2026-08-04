@@ -49,6 +49,7 @@ public class GatewayConfig {
                                 apiVersion + "/auth/docs", // ← public, no auth
                                 apiVersion + "/auth/docs/**", // ← public slugs, no auth
                                 apiVersion + "/auth/payment/**",
+                                apiVersion + "/auth/health/**",
                                 apiVersion + "/auth/resend-verification")
                         .and()
                         .method("POST", "GET")
