@@ -42,7 +42,7 @@ public class PublicDocsController {
         String role = "USER";
         System.out.println("token not present ===>: " + token.get().strip().equals(token.get()));
 
-        role = jwtUtil.extractRole(token.get().split(" ")[1].strip());
+
         if (token.isPresent() && !token.get().isBlank()) {
             String raw = token.get().trim();
             if (raw.regionMatches(true, 0, "Bearer ", 0, 7)) {
