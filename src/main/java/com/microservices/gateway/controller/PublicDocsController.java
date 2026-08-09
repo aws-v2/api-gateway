@@ -40,8 +40,6 @@ public class PublicDocsController {
     public ResponseEntity<?> getManifest(
             @RequestHeader(value = "Authorization", required = false) Optional<String> token) {
         String role = "USER";
-        System.out.println("token not present ===>: " + token.get().strip().equals(token.get()));
-
 
         if (token.isPresent() && !token.get().isBlank()) {
             String raw = token.get().trim();
@@ -81,7 +79,17 @@ public class PublicDocsController {
     }
 
     @GetMapping("/docs/{slug}")
-    public ResponseEntity<?> getDoc(@PathVariable String slug, @RequestHeader("X-User-Role") String role) {
+    public ResponseEntity<?> getDoc(@PathVariable String slug,
+            @RequestHeader(value = "Authorization", required = false) Optional<String> token) {
+        String role = "USER";
+
+        if (token.isPresent() && !token.get().isBlank()) {
+            String raw = token.get().trim();
+            if (raw.regionMatches(true, 0, "Bearer ", 0, 7)) {
+                raw = raw.substring(7).trim();
+            }
+            role = jwtUtil.extractRole(raw);
+        }
 
         try {
             if ("USER".equals(role)) {

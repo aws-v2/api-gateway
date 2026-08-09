@@ -55,6 +55,7 @@ else if ("staging".equals(profile)) {
             "http://localhost:5174",
             "http://139.144.169.155:5173",
             "http://139.144.169.155:5174",
+            "https://laptop.tailb98511.ts.net",
             "https://frontend-server-staging.onrender.com"  // <-- add this
     ));
 }
