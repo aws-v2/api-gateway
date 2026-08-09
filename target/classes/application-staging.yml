@@ -37,8 +37,10 @@ spring:
               - "*"
             allowCredentials: true
             maxAge: 3600
-
-
+ 
+      httpclient:
+        response-timeout: 3600s   # default is often 30s which kills SSE
+        connect-timeout: 5000
       discovery:
         locator:
           enabled: true
