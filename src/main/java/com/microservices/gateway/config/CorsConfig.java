@@ -37,6 +37,7 @@ public class CorsConfig {
                     "http://localhost:5173",
                     "http://localhost:8001",
                     "http://localhost:5174",
+                    "https://d558-2c0f-fe38-200a-7e8c-f2c-aa8a-f6d3-f158.ngrok-free.app",
                     "https://frontend-server-staging.onrender.com"  // <-- add this
 
             ));
