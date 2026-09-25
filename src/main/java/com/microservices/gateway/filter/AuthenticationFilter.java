@@ -34,20 +34,45 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-	private static final List<String> PUBLIC_ENDPOINTS = List.of( 
+	private static final List<String> PUBLIC_ENDPOINTS = List.of(
 
-			"/api/v1/llm/docs/**","/api/v1/llm/docs","/api/v1/llm/health/**","/api/v1/llm/health","/api/v1/gamelift/health/**","/api/v1/gamelift/health","/api/v1/auth/health","/api/v1/gateway/health","/api/v1/s3/health", "/api/v1/ec2/health", "/api/v1/rds/health", "/api/v1/rds/health/**", "/api/v1/lambda/health",
-			"/api/v1/sagemaker/health", "/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/verify",
-			"/api/v1/auth/mfa/verify", "/api/v1/auth/verify-email", "/api/v1/auth/resend-verification",
-			"/api/v1/auth/reset-password", "/api/v1/auth/forgot-password", "/api/v1/auth/docs", "/api/v1/auth/docs/**",
-			"/api/v1/ec2/docs", "/api/v1/ec2/docs/**", "/api/v1/lambda/docs", "/api/v1/lambda/docs/**",
-			"/api/v1/rds/docs", "/api/v1/rds/docs/**", "/api/v1/identity/docs", "/api/v1/identity/docs/**",
-			"/api/v1/gamelift/docs", "/api/v1/gamelift/docs/**", "/api/v1/fargate/docs", "/api/v1/fargate/docs/**",
-			"/api/v1/gateway/docs", "/api/v1/gateway/docs/**", "/api/v1/sagemaker/docs",
-			"/api/v1/sagemaker/docs/**", "/api/v1/network/docs", "/api/v1/network/docs/**", "/api/v1/metrics/docs",
-			"/api/v1/metrics/docs/**", "/api/v1/s3/docs", "/api/v1/s3/docs/**", "/api/v1/config/docs",
-			"/api/v1/config/docs/**", "/api/v1/gateway/docs", "/api/v1/gateway/docs/**", "/api/v1/billing/docs",
-			"/api/v1/billing/docs/**");
+			"/api/v1/llm/health/**", "/api/v1/llm/health",
+
+			"/api/v1/gamelift/health/**", "/api/v1/gamelift/health",
+
+			"/api/v1/auth/health",
+			"/api/v1/gateway/health",
+			"/api/v1/s3/health",
+			"/api/v1/ec2/health",
+			"/api/v1/rds/health", "/api/v1/rds/health/**",
+			"/api/v1/lambda/health",
+			"/api/v1/sagemaker/health",
+
+			"/api/v1/auth/login",
+			"/api/v1/auth/register",
+			"/api/v1/auth/verify",
+			"/api/v1/auth/mfa/verify",
+			"/api/v1/auth/verify-email",
+			"/api/v1/auth/resend-verification",
+			"/api/v1/auth/reset-password",
+			"/api/v1/auth/forgot-password");
+
+	private static final List<String> DOCS_ENDPOINTS = List.of(
+			"/api/v1/llm/docs/**", "/api/v1/llm/docs",
+			"/api/v1/gamelift/docs", "/api/v1/gamelift/docs/**",
+			"/api/v1/ec2/docs", "/api/v1/ec2/docs/**",
+			"/api/v1/lambda/docs", "/api/v1/lambda/docs/**",
+			"/api/v1/rds/docs", "/api/v1/rds/docs/**",
+			"/api/v1/identity/docs", "/api/v1/identity/docs/**",
+			"/api/v1/fargate/docs", "/api/v1/fargate/docs/**",
+			"/api/v1/gateway/docs", "/api/v1/gateway/docs/**",
+			"/api/v1/sagemaker/docs", "/api/v1/sagemaker/docs/**",
+			"/api/v1/network/docs", "/api/v1/network/docs/**",
+			"/api/v1/metrics/docs", "/api/v1/metrics/docs/**",
+			"/api/v1/s3/docs", "/api/v1/s3/docs/**",
+			"/api/v1/config/docs", "/api/v1/config/docs/**",
+			"/api/v1/billing/docs", "/api/v1/billing/docs/**",
+			"/api/v1/auth/docs", "/api/v1/auth/docs/**");
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -56,6 +81,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 		String userId = "x";
 		String authMethod = "None";
 		String role;
+		System.out.println("AT the top of the filter method");
 
 		// 1. Public endpoints — no auth
 		// TODO: this is glue code,it should be removed
@@ -66,15 +92,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 		// in each microservice blocks the reques,
 		// so we do somehting dangerous
 
-		// TODO:
-		// a cool idea, we could create a scheduler born to solve this problem,
-		// instead of the frontend sending docs requests for each service,
-		// we could have a poll here that polls each service and stores the docs
-		// manifest in redis, the frontend be making one docs/manifest call and getting
-		// allthe
-		// manifest for allavailable services,
-		// the pollis done onfirst run and then updaetdevery hour
 		if (isPublicEndpoint(path)) {
+			System.out.println("*checking if is public endpoint");
 
 			ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("X-Auth-Method", "None")
 					.header("X-User-Role", "USER").header("X-User-Id", "xx")
@@ -84,8 +103,13 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 			return chain.filter(exchange.mutate().request(mutatedRequest).build());
 		}
-		String credential = null;
 
+		if (isDocsEndpoint(path)) {
+			System.out.println("Is docs enpoint called");
+			return handleDocsAuth(exchange, chain, path, requestId);
+		}
+
+		String credential = null;
 		// 2. Try Authorization: Bearer <token>
 		String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
@@ -93,9 +117,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 			credential = authHeader.substring(7).trim();
 			authMethod = "jwt";
 		}
-// TODO: number 4 is above number 3 because the query authenticatorisnt working
-// properly,for now we put the apikey 
-// 4. Fallback to X-Api-Key
+		// TODO: number 4 is above number 3 because the query authenticatorisnt working
+		// properly,for now we put the apikey
+		// 4. Fallback to X-Api-Key
 		if (credential == null || credential.isBlank()) {
 			String apiKey = exchange.getRequest().getHeaders().getFirst("X-Api-Key");
 
@@ -114,8 +138,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 			}
 		}
 
-		
-
 		// 5. No credentials found
 		if (credential == null || credential.isBlank()) {
 			return failAuth(exchange, path, "MISSING_CREDENTIALS");
@@ -125,34 +147,34 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 		switch (authMethod) {
 
-		case "jwt":
-		case "query":
+			case "jwt":
+			case "query":
 
-			if (!jwtUtil.isTokenValid(credential)) {
-				return failAuth(exchange, path, "JWT_SIGNATURE");
-			}
+				if (!jwtUtil.isTokenValid(credential)) {
+					return failAuth(exchange, path, "JWT_SIGNATURE");
+				}
 
-			userId = jwtUtil.extractUserId(credential);
-			role = jwtUtil.extractRole(credential);
+				userId = jwtUtil.extractUserId(credential);
+				role = jwtUtil.extractRole(credential);
 
-			System.out.println("====> uwthMethod: " + userId + " Url: " + role);
+				System.out.println("====> uwthMethod: " + userId + " Url: " + role);
 
+				break;
 
-			break;
+			case "api-key":
 
-		case "api-key":
+				// Replace with your actual validation logic
+				if (!jwtUtil.isApiKeyValid(credential)) {
+					return failAuth(exchange, path, "INVALID_API_KEY");
+				}
 
-			// Replace with your actual validation logic
-			if (!jwtUtil.isApiKeyValid(credential)) {
-				return failAuth(exchange, path, "INVALID_API_KEY");
-			}
+				userId = jwtUtil.extractUserIdFromApiKey(credential);
+				role = "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM"
+						: jwtUtil.getUserRole(credential);
+				break;
 
-			userId = jwtUtil.extractUserIdFromApiKey(credential);
-			role = "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM" : jwtUtil.getUserRole(credential);
-			break;
-
-		default:
-			return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
+			default:
+				return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
 		}
 
 		log.info("[auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
@@ -169,6 +191,90 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 				exchange.mutate().request(mutatedRequest).build()
 
 		);
+	}
+
+	private boolean isDocsEndpoint(String path) {
+		System.out.println("*checking if is docs endpoint");
+		return DOCS_ENDPOINTS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+	}
+
+	private Mono<Void> handleDocsAuth(ServerWebExchange exchange, GatewayFilterChain chain, String path,
+			String requestId) {
+		String credential = null;
+		String authMethod = "None";
+
+		String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			credential = authHeader.substring(7).trim();
+			authMethod = "jwt";
+		}
+
+		if (credential == null || credential.isBlank()) {
+			String apiKey = exchange.getRequest().getHeaders().getFirst("X-Api-Key");
+			if (apiKey != null && !apiKey.isBlank()) {
+				credential = apiKey.trim();
+				authMethod = "api-key";
+			}
+		}
+
+		if (credential == null || credential.isBlank()) {
+			String queryToken = exchange.getRequest().getQueryParams().getFirst("token");
+			if (queryToken != null && !queryToken.isBlank()) {
+				credential = queryToken.trim();
+				authMethod = "query";
+			}
+		}
+
+		String userId = "xx";
+		String role = "USER";
+
+		if (credential != null && !credential.isBlank()) {
+			try {
+				switch (authMethod) {
+					case "jwt":
+					case "query":
+						if (jwtUtil.isTokenValid(credential)) {
+							userId = jwtUtil.extractUserId(credential);
+							role = jwtUtil.extractRole(credential);
+						} else {
+							log.info("[docs-auth] invalid/expired token on {}, falling back to anonymous", path);
+						}
+						break;
+
+					case "api-key":
+						if (jwtUtil.isApiKeyValid(credential)) {
+							userId = jwtUtil.extractUserIdFromApiKey(credential);
+							role = "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM"
+									: jwtUtil.getUserRole(credential);
+						} else {
+							log.info("[docs-auth] invalid api key on {}, falling back to anonymous", path);
+						}
+						break;
+				}
+			} catch (Exception e) {
+				// Any validation error on a docs route degrades to anonymous
+				// rather than failing the request.
+				log.warn("[docs-auth] error validating credential on {}: {}", path, e.getMessage());
+				userId = "xx";
+				role = "USER";
+			}
+		}
+
+		if (role == null || role.isBlank()) {
+			role = "USER";
+		}
+
+		log.info("[docs-auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
+
+		ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+				.header("X-Auth-Method", authMethod)
+				.header("X-User-Id", userId)
+				.header("X-User-Role", role)
+				.header("X-User-Role", role)
+				.header("X-Request-Id", requestId)
+				.build();
+
+		return chain.filter(exchange.mutate().request(mutatedRequest).build());
 	}
 
 	private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
@@ -188,6 +294,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 	}
 
 	private boolean isPublicEndpoint(String path) {
+
 		return PUBLIC_ENDPOINTS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
 	}
 

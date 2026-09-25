@@ -51,7 +51,7 @@ public class DocsService {
             if (internal) {
                 manifest.setInternal(raw.categories);
             } else {
-                manifest.setPublicCategories(raw.categories);
+                // manifest.getPublicDocs(raw.categories);
             }
 
             return manifest;

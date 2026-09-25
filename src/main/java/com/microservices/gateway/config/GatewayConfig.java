@@ -266,6 +266,7 @@ public class GatewayConfig {
                                                 .filters(f -> f
                                                                 .stripPrefix(0))
                                                 .uri("lb://llm-gateway"))
+ 
 
                                 // =================================================
                                 // GAMELIFT SERVICE

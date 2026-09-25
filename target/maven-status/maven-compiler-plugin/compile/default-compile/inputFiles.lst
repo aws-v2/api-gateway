@@ -3,6 +3,7 @@
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/config/GatewayConfig.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/config/SecurityConfig.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/controller/PublicDocsController.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/ApiEnvelope.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocCategory.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocItem.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/dto/DocManifest.java
@@ -12,6 +13,8 @@
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AdminRoleFilter.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/JwtAuthenticationFilter.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsManifestCache.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsPollingService.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsService.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/NatsListener.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/NatsService.java

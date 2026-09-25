@@ -2,6 +2,7 @@ com/microservices/gateway/config/CorsConfig.class
 com/microservices/gateway/dto/Metadata.class
 com/microservices/gateway/util/JwtUtil$ApiKeyPayload.class
 com/microservices/gateway/ApiGatewayApplication.class
+com/microservices/gateway/service/DocsPollingService$1.class
 com/microservices/gateway/config/GatewayConfig.class
 com/microservices/gateway/service/NatsService.class
 com/microservices/gateway/util/JwtUtil.class

@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		ServerHttpRequest request = exchange.getRequest();
 		String path = request.getURI().getPath();
+			System.out.println("Is public enpoint called7");
 
         String requestId = UUID.randomUUID().toString();
 		if (request.getMethod() == HttpMethod.OPTIONS) {
@@ -38,6 +39,12 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 			return chain.filter(exchange);
 		}
 
+			// ── Public paths — skip auth entirely ────────────────────────────────
+		if (isPublicDocsPath(path)) {
+			return chain.filter(exchange);
+		}
+
+		
 		// ── Already authenticated upstream (e.g. Global API Key filter) ──────
 		if (request.getHeaders().containsKey("X-User-Id")) {
 			return chain.filter(exchange);

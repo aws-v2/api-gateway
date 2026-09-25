@@ -1,16 +1,21 @@
+
 package com.microservices.gateway.controller;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.microservices.gateway.dto.DocCategory;
 import com.microservices.gateway.dto.DocManifest;
 import com.microservices.gateway.dto.DocResponse;
 import com.microservices.gateway.service.DocsService;
+import com.microservices.gateway.service.DocsManifestCache;
 import com.microservices.gateway.util.JwtUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 @RestController
 @RequestMapping("/api/v1/gateway")
@@ -31,9 +37,92 @@ public class PublicDocsController {
         this.docsService = docsService;
     }
 
+    @Autowired
+    private DocsManifestCache docsManifestCache;
+
     @GetMapping("/health")
     public ResponseEntity<?> healthHandler() {
         return ResponseEntity.ok(Map.of("ping", "pong"));
+    }
+
+    private static final Set<String> ELEVATED_ROLES = Set.of("ADMIN", "SYSTEM", "STAFF");
+
+    @GetMapping("/docs/all-manifest")
+    public ResponseEntity<?> getAllDocsManifests(ServerWebExchange exchange) {
+        String role = resolveRole(exchange);
+        System.out.println("The role is:" + role);
+        boolean includeInternal = role != null && ELEVATED_ROLES.contains(role.toUpperCase());
+
+        ConcurrentHashMap<String, DocManifest> cached = docsManifestCache.snapshot();
+        Map<String, DocManifest> response = new ConcurrentHashMap<>();
+
+        for (Map.Entry<String, DocManifest> entry : cached.entrySet()) {
+            DocManifest source = entry.getValue();
+
+            System.out.println("the source: " + source.toString());
+
+            DocManifest filtered = new DocManifest();
+            filtered.setService(source.getService());
+            filtered.setApiVersion(source.getApiVersion());
+            filtered.setScope(source.getScope());
+            filtered.setPublicDocs(source.getPublicDocs());
+            filtered.setInternal(includeInternal ? source.getInternal() : List.of());
+
+            response.put(entry.getKey(), filtered);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * This controller is resolved directly by Spring's annotated-controller
+     * dispatch, bypassing the Gateway's route/filter chain entirely (Spring's
+     * RequestMappingHandlerMapping takes priority over Gateway's
+     * RoutePredicateHandlerMapping for any path with a matching @GetMapping).
+     * That means AuthenticationFilter never runs for this endpoint, so we
+     * resolve the caller's role here directly, degrading to anonymous on any
+     * failure — docs should never hard-fail on a bad/missing credential.
+     */
+    private String resolveRole(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7).trim();
+            try {
+                if (jwtUtil.isTokenValid(token)) {
+                    return jwtUtil.extractRole(token);
+                }
+            } catch (Exception e) {
+                // fall through to anonymous
+            }
+            return "USER";
+        }
+
+        String apiKey = exchange.getRequest().getHeaders().getFirst("X-Api-Key");
+        if (apiKey != null && !apiKey.isBlank()) {
+            try {
+                if (jwtUtil.isApiKeyValid(apiKey)) {
+                    String userId = jwtUtil.extractUserIdFromApiKey(apiKey);
+                    return "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM"
+                            : jwtUtil.getUserRole(apiKey);
+                }
+            } catch (Exception e) {
+                // fall through to anonymous
+            }
+            return "USER";
+        }
+
+        String queryToken = exchange.getRequest().getQueryParams().getFirst("token");
+        if (queryToken != null && !queryToken.isBlank()) {
+            try {
+                if (jwtUtil.isTokenValid(queryToken)) {
+                    return jwtUtil.extractRole(queryToken);
+                }
+            } catch (Exception e) {
+                // fall through to anonymous
+            }
+        }
+
+        return "USER";
     }
 
     @GetMapping("/docs")
@@ -58,7 +147,7 @@ public class PublicDocsController {
                         "apiVersion", nullToEmpty(publicManifest.getApiVersion()),
                         "scope", "public",
                         "internal", List.<DocCategory>of(),
-                        "public", publicManifest.getPublicCategories())));
+                        "public", publicManifest.getPublicDocs())));
             }
 
             // Administrative/internal roles get both manifests
@@ -121,8 +210,8 @@ public class PublicDocsController {
         if (m == null) {
             return List.of();
         }
-        if (m.getPublicCategories() != null && !m.getPublicCategories().isEmpty()) {
-            return m.getPublicCategories();
+        if (m.getPublicDocs() != null && !m.getPublicDocs().isEmpty()) {
+            return m.getPublicDocs();
         }
         if (m.getInternal() != null && !m.getInternal().isEmpty()) {
             return m.getInternal();
