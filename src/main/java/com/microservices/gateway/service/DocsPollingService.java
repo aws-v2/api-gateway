@@ -47,7 +47,8 @@ public class DocsPollingService {
 
             Map.entry("rds", "/api/v1/rds/docs"),
     Map.entry("llm", "/api/v1/llm/docs"),
-    Map.entry("api", "/api/v1/gateway/docs")
+    Map.entry("api", "/api/v1/gateway/docs"),
+    Map.entry("auth", "/api/v1/auth/docs")
     // ... one entry per service that exposes docs
     );
 
@@ -57,7 +58,7 @@ public class DocsPollingService {
         pollAll();
     }
 
-    @Scheduled(fixedRateString = "${docs.poll-interval-ms:3600}")
+    @Scheduled(fixedRateString = "${docs.poll-interval-ms:36000}")
     public void scheduledPoll() {
         log.info("[DocsPolling] running scheduled poll");
         pollAll();
