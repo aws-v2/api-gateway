@@ -1,0 +1,404 @@
+services:
+
+  # ── Infrastructure ────────────────────────────────────────────────────────
+
+
+  # CREATE DATABASE s3_db;
+  # CREATE DATABASE network_db;
+  # CREATE DATABASE metrics_db;
+  # CREATE DATABASE rds_db;
+  # CREATE DATABASE ec2_db;
+  # CREATE DATABASE lambda_db;
+  # CREATE DATABASE auth_db;
+  # CREATE DATABASE iam_db;
+
+
+  postgres:
+    image: postgres:17
+    container_name: postgres-prod
+    environment:
+      POSTGRES_USER: prod-postgres-user
+      POSTGRES_PASSWORD: prod-postgres-password
+      POSTGRES_DB:  iam_db  #how to create multiple database 
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # - ./postgres/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # nats:
+  #   image: nats:latest
+  #   container_name: nats
+  #   command: [
+  #     "-js",
+  #     "--user", "auth-server",
+  #     "--pass", "auth-secret"
+  #   ]
+  #   ports:
+  #     - "4222:4222"
+  #     - "8222:8222" # optional: monitoring
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: [ "CMD", "nats-server", "--help" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #   retries: 5
+
+  # minio:
+  #   image: minio/minio
+  #   container_name: minio
+  #   command: server /data --console-address ":9001"
+  #   environment:
+  #     MINIO_ROOT_USER: minioadmin
+  #     MINIO_ROOT_PASSWORD: minioadmin123
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   volumes:
+  #     - minio_data:/data
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: [ "CMD", "redis-cli", "ping" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # # ── Java services ─────────────────────────────────────────────────────────
+
+  # discovery-server:
+  #   image: qarani/discovery-server
+  #   container_name: discovery-server
+  #   ports:
+  #     - "8761:8761"
+  #   restart: unless-stopped
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 5
+
+  # config-server:
+  #   image: qarani/config-server:latest
+  #   container_name: config-server
+  #   ports:
+  #     - "8888:8888"
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+  #   restart: unless-stopped
+
+  # api-gateway:
+  #   image: qarani/api-gateway:latest
+  #   container_name: api-gateway
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   networks:
+  #     - backend
+
+  # auth-service:
+  #   image: qarani/auth-server:latest
+  #   container_name: auth-service
+  #   ports:
+  #     - "8081:8081"
+  #   environment:
+  #     SERVER_PORT: 8081
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - backend
+
+  # iam-service:
+  #   image: qarani/iam-server:latest
+  #   container_name: iam-service
+  #   ports:
+  #     - "8087:8087"
+  #   environment:
+  #     SERVER_PORT: 8087
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - backend
+
+  # # ── Golang services ───────────────────────────────────────────────────────
+
+  # s3-service:
+  #   image: qarani/s3-server
+  #   container_name: s3-service
+  #   ports:
+  #     - "8083:8083"
+  #   environment:
+  #     SERVER_PORT: 8083
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_PORT: 5432
+  #     POSTGRES_USER: root
+  #     POSTGRES_PASSWORD: root
+  #     POSTGRES_DB: s3_db
+  #     MINIO_ENDPOINT: minio:9000
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin123
+  #     MINIO_USE_SSL: "false"
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # network-service:
+  #   image: qarani/network-server
+  #   container_name: network-service
+  #   ports:
+  #     - "8084:8084"
+  #   environment:
+  #     HTTP_PORT: 8084
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: network_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     PUBLIC_INTERFACE: eth0
+  #     APP_PROFILE: DEV
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # metrics-service:
+  #   image: qarani/metrics-server
+  #   container_name: metrics-service
+  #   ports:
+  #     - "8085:8085"
+  #   environment:
+  #     HTTP_PORT: 8085
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: metrics_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     INSTANCE_TOKEN_SECRET: 6A576E5A7234753778214125442A472D4B6150645367566B5970337336763979
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # fargate-service:
+  #   image: qarani/fargate-server
+  #   container_name: fargate-service
+  #   ports:
+  #     - "8086:8086"
+  #   environment:
+  #     APP_PROFILE: DEV
+  #     SERVER_PORT: 8086
+  #     EUREKA_SERVER_URL: http://discovery-server:8761/eureka
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USERNAME: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     EUREKA_HOSTNAME: fargate-service
+  #     EUREKA_IP_ADDR: fargate-service
+  #     CONFIG_SERVER_URL: http://config-server:8888
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   depends_on:
+  #     discovery-server:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #     config-server:
+  #       condition: service_started
+  #   networks:
+  #     - backend
+
+  # rds-server:
+  #   image: qarani/rds-server
+  #   container_name: rds-server
+  #   ports:
+  #     - "8087:8087"
+  #   environment:
+  #     RDS_PORT: 8087
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: rds_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     EUREKA_SERVER_URL: http://discovery-server:8761/eureka
+  #     PUBLIC_HOST_IP: 192.168.1.7
+  #     APP_PROFILE: DEV
+  #     AWS_REGION: eu-north-1
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #     discovery-server:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # ec2-service:
+  #   image: qarani/ec2
+  #   container_name: ec2-service
+  #   ports:
+  #     - "8088:8088"
+  #   environment:
+  #     SERVER_PORT: 8088
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: ec2_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     APP_PROFILE: DEV
+  #     IMAGES_DIR: /app/data/images
+  #     LIBVIRT_URI: qemu:///system
+  #   volumes:
+  #     - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+  #     - ec2_images:/app/data/images
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # lambda-service:
+  #   image: qarani/lambda-server
+  #   container_name: lambda-service
+  #   ports:
+  #     - "8089:8089"
+  #   environment:
+  #     SERVER_PORT: 8089
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: lambda_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #     APP_PROFILE: DEV
+  #     IMAGES_DIR: /app/data/images
+  #     LIBVIRT_URI: qemu:///system
+  #   volumes:
+  #     - /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock
+  #     - ec2_images:/app/data/images
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # billing-service:
+  #   build:
+  #     context: ./billing-server
+  #     dockerfile: Dockerfile
+  #   image: qarani/billing-server
+  #   container_name: billing-service
+  #   ports:
+  #     - "8090:8090"
+  #   environment:
+  #     HTTP_PORT: 8090
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_USER: root
+  #     DB_PASSWORD: root
+  #     DB_NAME: billing_db
+  #     NATS_URL: nats://nats:4222
+  #     NATS_USER: auth-server
+  #     NATS_PASSWORD: auth-secret
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     nats:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+
+  # # ── Frontend ──────────────────────────────────────────────────────────────
+
+  # frontend:
+  #   image: qarani/frontend-server:latest
+  #   container_name: frontend
+  #   ports:
+  #     - "5173:5173"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api-gateway
+  #   networks:
+  #     - backend
+
+volumes:
+  postgres_data:
+  ec2_images:
+  minio_data:
+
+
+networks:
+  backend:
+    driver: bridge
