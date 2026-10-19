@@ -16,6 +16,7 @@
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsManifestCache.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsPollingService.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsService.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/NatsListener.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/NatsService.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/util/JwtUtil.java
