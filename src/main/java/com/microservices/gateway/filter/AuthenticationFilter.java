@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import java.util.UUID;
+import com.microservices.gateway.service.AuthMetrics;
 
 import java.util.List;
 import com.microservices.gateway.util.*;
@@ -28,9 +29,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 	@Autowired
 	private JwtUtil jwtUtil;
+
+	
 	
 	@Autowired
-	 private final AuthMetrics authMetrics;
+	 private   AuthMetrics authMetrics;
 
 
 	@Autowired
