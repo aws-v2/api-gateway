@@ -11,3 +11,10 @@ spring:
       httpclient:
         response-timeout: 3600s   # default is often 30s which kills SSE
         connect-timeout: 5000
+
+logging:
+  file:
+    name: /home/martin/Documents/aws-v4/dev/logs/api-gateway.log
+  structured:
+    format:
+      file: ecs

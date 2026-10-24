@@ -6750,3 +6750,242 @@ WARNING: Unmatched cancel notification for request id 61
 2026.10.20 02:44:57 INFO  Memory monitor started
 2026.10.20 02:45:02 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
 2026.10.20 02:45:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.20 02:45:09 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.20 02:45:15 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.20 02:45:28 INFO  Shutting down server
+2026.10.20 02:45:28 INFO  Memory monitor stopped
+2026.10.20 02:45:28 INFO  shutting down Metals
+2026.10.20 02:45:29 INFO  Exiting server
+2026.10.21 03:29:32 INFO  Started: Metals version 1.6.9 in folders '/home/martin/Documents/aws-v4/dev/Java/api-gateway' for client Visual Studio Code 1.142.0.
+2026.10.21 03:29:33 INFO  time: initialize in 0.11s
+2026.10.21 03:29:32 INFO  Memory monitor started
+2026.10.21 03:29:35 WARN  Using H2 2.5.250 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.10.21 03:29:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 21, 2026 3:29:39 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1
+2026.10.21 03:29:39 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 21, 2026 2:44:14 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Oct 22, 2026 3:28:34 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2026.10.24 03:20:37 INFO  Started: Metals version 1.6.9 in folders '/home/martin/Documents/aws-v4/dev/Java/api-gateway' for client Visual Studio Code 1.142.0.
+2026.10.24 03:20:37 INFO  time: initialize in 0.16s
+2026.10.24 03:20:37 INFO  Memory monitor started
+2026.10.24 03:20:40 WARN  Using H2 2.5.250 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+Exception in thread "MVStore background writer /home/martin/Documents/aws-v4/dev/Java/api-gateway/.metals/metals.mv.db" org.h2.mvstore.MVStoreException: Unable to read the page at position 0x27c000776520, chunk chunk:9f,block:6,len:b1,pages:83,livePages:63,max:d7e90,liveMax:b5c00,map:63,root:27c002bf3d14,time:2cd995ab2,unusedAtVersion:9f,version:9f,toc:b00a0,occupancy:fffeffff00000000000000000000000004, offset 0xorg.h2.message.DbException: File corrupted while reading record: "type: 1". Possible solution: use the recovery tool [90030-250] [2.5.250/6]
+	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:998)
+	at org.h2.mvstore.FileStore.readPage(FileStore.java:1997)
+	at org.h2.mvstore.MVStore.readPage(MVStore.java:1158)
+	at org.h2.mvstore.MVMap.readPage(MVMap.java:632)
+	at org.h2.mvstore.MVMap.rewritePage(MVMap.java:682)
+	at org.h2.mvstore.FileStore.rewriteChunks(FileStore.java:1955)
+	at org.h2.mvstore.FileStore.compactRewrite(FileStore.java:1929)
+	at org.h2.mvstore.FileStore.rewriteChunks(FileStore.java:1890)
+	at org.h2.mvstore.RandomAccessStore.lambda$doHousekeeping$4(RandomAccessStore.java:750)
+	at org.h2.mvstore.MVStore.tryExecuteUnderStoreLock(MVStore.java:1075)
+	at org.h2.mvstore.RandomAccessStore.doHousekeeping(RandomAccessStore.java:745)
+	at org.h2.mvstore.FileStore.writeInBackground(FileStore.java:1869)
+	at org.h2.mvstore.FileStore$BackgroundWriterThread.run(FileStore.java:2266)
+	Suppressed: org.h2.message.DbException: General error: "org.h2.mvstore.MVStoreException: Unable to read the page at position 0x27c000776520, chunk chunk:9f,block:6,len:b1,pages:83,livePages:63,max:d7e90,liveMax:b5c00,map:63,root:27c002bf3d14,time:2cd995ab2,unusedAtVersion:9f,version:9f,toc:b00a0,occupancy:fffeffff00000000000000000000000004, offset 0xorg.h2.message.DbException: File corrupted while reading record: ""type: 1"". Possible solution: use the recovery tool [90030-250] [2.5.250/6]" [50000-250]
+		at org.h2.message.DbException.get(DbException.java:212)
+		at org.h2.message.DbException.convert(DbException.java:407)
+		at org.h2.mvstore.db.Store.lambda$new$0(Store.java:123)
+		at org.h2.mvstore.MVStore.handleException(MVStore.java:1693)
+		at org.h2.mvstore.MVStore.panic(MVStore.java:521)
+		at org.h2.mvstore.MVStore.tryExecuteUnderStoreLock(MVStore.java:1077)
+		... 3 more
+	Caused by: org.h2.jdbc.JdbcSQLNonTransientException: General error: "org.h2.mvstore.MVStoreException: Unable to read the page at position 0x27c000776520, chunk chunk:9f,block:6,len:b1,pages:83,livePages:63,max:d7e90,liveMax:b5c00,map:63,root:27c002bf3d14,time:2cd995ab2,unusedAtVersion:9f,version:9f,toc:b00a0,occupancy:fffeffff00000000000000000000000004, offset 0xorg.h2.message.DbException: File corrupted while reading record: ""type: 1"". Possible solution: use the recovery tool [90030-250] [2.5.250/6]" [50000-250]
+		at org.h2.message.DbException.getJdbcSQLException(DbException.java:566)
+		at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+		... 9 more
+	Caused by: [CIRCULAR REFERENCE: org.h2.mvstore.MVStoreException: Unable to read the page at position 0x27c000776520, chunk chunk:9f,block:6,len:b1,pages:83,livePages:63,max:d7e90,liveMax:b5c00,map:63,root:27c002bf3d14,time:2cd995ab2,unusedAtVersion:9f,version:9f,toc:b00a0,occupancy:fffeffff00000000000000000000000004, offset 0xorg.h2.message.DbException: File corrupted while reading record: "type: 1". Possible solution: use the recovery tool [90030-250] [2.5.250/6]]
+Caused by: org.h2.message.DbException: File corrupted while reading record: "type: 1". Possible solution: use the recovery tool [90030-250]
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.ValueDataType.readValue(ValueDataType.java:771)
+	at org.h2.mvstore.db.RowDataType.read(RowDataType.java:157)
+	at org.h2.mvstore.db.RowDataType.read(RowDataType.java:29)
+	at org.h2.mvstore.tx.VersionedValueType.read(VersionedValueType.java:77)
+	at org.h2.mvstore.tx.VersionedValueType.read(VersionedValueType.java:66)
+	at org.h2.mvstore.Page$Leaf.readPayLoad(Page.java:1718)
+	at org.h2.mvstore.Page.read(Page.java:673)
+	at org.h2.mvstore.Page.read(Page.java:264)
+	at org.h2.mvstore.FileStore.readPage(FileStore.java:1993)
+	... 11 more
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: File corrupted while reading record: "type: 1". Possible solution: use the recovery tool [90030-250]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:690)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	... 22 more
+2026.10.24 03:20:40 WARN  resetting database: Some(/home/martin/Documents/aws-v4/dev/Java/api-gateway/.metals/metals.h2.db)
+2026.10.24 03:20:40 WARN  Using H2 2.5.250 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.10.24 03:20:41 WARN  Using H2 2.5.250 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.10.24 03:20:42 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:20:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:20:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:20:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:20:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:21:00 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:21:02 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 14
+2026.10.24 03:21:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:21:03 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 15
+2026.10.24 03:22:15 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java. Using fallback presentation compiler.
+2026.10.24 03:22:16 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java. Using fallback presentation compiler.
+2026.10.24 03:22:15 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java. Using fallback presentation compiler.
+2026.10.24 03:22:17 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java. Using fallback presentation compiler.
+2026.10.24 03:22:18 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/MetricsServer.java. Using fallback presentation compiler.
+2026.10.24 03:23:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:02 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java
+2026.10.24 03:23:02 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AdminRoleFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:04 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:05 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:09 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:09 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+Oct 24, 2026 3:23:09 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 42
+2026.10.24 03:23:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:12 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java
+2026.10.24 03:23:12 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:45 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:46 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:23:46 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:57 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:23:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:58 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:23:59 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:23:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:23:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:06 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:21 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:21 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:21 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:24:22 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 85
+2026.10.24 03:24:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:24 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:24:24 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:24 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:24:26 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:24:26 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:26 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:24:35 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:37 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:37 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:46 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:46 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:48 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:49 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:49 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:50 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:24:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:24:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:24:51 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:24:51 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:24:51 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:22 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:22 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:23 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:25:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:23 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:25:26 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:31 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:32 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:31 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:33 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:25:34 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:34 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+Oct 24, 2026 3:25:34 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 151
+2026.10.24 03:25:34 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:34 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:34 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:35 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:35 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:35 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:36 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:25:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:36 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:25:46 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:25:46 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 171
+2026.10.24 03:25:48 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:48 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:49 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:25:49 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 178
+2026.10.24 03:25:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:50 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:25:51 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:50 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:25:51 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:26:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:26:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:26:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:26:13 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:26:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:26:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:27:44 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:45 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:46 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:47 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:27:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:27:48 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:27:48 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:48 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:27:47 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:54 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:54 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:55 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:27:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:55 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:27:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:56 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:57 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:27:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:27:58 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 256
+2026.10.24 03:27:58 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:58 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+Oct 24, 2026 3:27:58 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 258
+2026.10.24 03:27:57 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:58 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:27:59 WARN  no build target for: /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
+2026.10.24 03:27:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+2026.10.24 03:27:59 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:28:03 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:28:03 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:28:04 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 275
+2026.10.24 03:28:04 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:28:04 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:28:04 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+Oct 24, 2026 3:28:04 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 277
+2026.10.24 03:28:13 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java. Using fallback presentation compiler.
+2026.10.24 03:28:43 INFO  no build target found for /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java. Using fallback presentation compiler.
+Oct 24, 2026 3:28:45 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace

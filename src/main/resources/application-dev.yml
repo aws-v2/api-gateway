@@ -90,6 +90,9 @@ management:
     prometheus:
       access: unrestricted
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
     tags:
       application: api-gateway
 

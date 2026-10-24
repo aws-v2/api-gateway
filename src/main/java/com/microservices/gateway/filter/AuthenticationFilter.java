@@ -28,6 +28,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 	@Autowired
 	private JwtUtil jwtUtil;
+	
+	@Autowired
+	 private final AuthMetrics authMetrics;
+
 
 	@Autowired
 	private com.microservices.gateway.service.NatsService natsService;
@@ -94,6 +98,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 		if (isPublicEndpoint(path)) {
 			System.out.println("*checking if is public endpoint");
+			    authMetrics.record("public", "success", "none");
+
 
 			ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("X-Auth-Method", "None")
 					.header("X-User-Role", "USER").header("X-User-Id", "xx")
@@ -105,8 +111,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 		}
 
 		if (isDocsEndpoint(path)) {
-			System.out.println("Is docs enpoint called");
-			return handleDocsAuth(exchange, chain, path, requestId);
+    authMetrics.record("docs", "success", "none");   // see note below
+    return handleDocsAuth(exchange, chain, path, requestId);
 		}
 
 		String credential = null;
@@ -140,7 +146,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 		// 5. No credentials found
 		if (credential == null || credential.isBlank()) {
-			return failAuth(exchange, path, "MISSING_CREDENTIALS");
+			  authMetrics.record("none", "failure", "MISSING_CREDENTIALS");
+    return failAuth(exchange, path, "MISSING_CREDENTIALS");
 		}
 
 		// 6. Validate based on auth method
@@ -151,6 +158,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 			case "query":
 
 				if (!jwtUtil.isTokenValid(credential)) {
+					  authMetrics.record(authMethod, "failure", "JWT_SIGNATURE");
 					return failAuth(exchange, path, "JWT_SIGNATURE");
 				}
 
@@ -165,6 +173,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
 				// Replace with your actual validation logic
 				if (!jwtUtil.isApiKeyValid(credential)) {
+					        authMetrics.record(authMethod, "failure", "INVALID_API_KEY");
 					return failAuth(exchange, path, "INVALID_API_KEY");
 				}
 
@@ -176,7 +185,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 			default:
 				return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
 		}
-
+authMetrics.record(authMethod, "success", "none");
 		log.info("[auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
 
 		// 7. Forward auth context downstream

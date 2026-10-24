@@ -13,6 +13,7 @@
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AdminRoleFilter.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/AuthenticationFilter.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/filter/JwtAuthenticationFilter.java
+/home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/AuthMetrics.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsManifestCache.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsPollingService.java
 /home/martin/Documents/aws-v4/dev/Java/api-gateway/src/main/java/com/microservices/gateway/service/DocsService.java
