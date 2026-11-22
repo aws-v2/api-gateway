@@ -1,5 +1,6 @@
 server:
   port: ${PROD_SERVER_PORT:8080}
+  address: 0.0.0.0
 
 api:
   version: ${PROD_API_VERSION}
@@ -47,7 +48,12 @@ spring:
       ignored-interfaces:
         - docker0
         - veth.*
-    gateway:
+
+      httpclient:
+        response-timeout: 3600s   # default is often 30s which kills SSE
+        connect-timeout: 5000
+
+        
       discovery:
         locator:
           enabled: true
@@ -73,10 +79,28 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env,refresh
+        include: health,info,prometheus,refresh
   endpoint:
     health:
       show-details: always
+    prometheus:
+      access: unrestricted
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: api-gateway
+
+
+ 
+
+metrics:
+  server:
+    port: 7082
+    api-key: ${METRICS_API_KEY:e956807e27669001319d73d3a9f1728a4a1161c79a6a287160c3a73394c05df8}
+
+
   level:
     root: DEBUG
     org.springframework.cloud.gateway: TRACE
@@ -86,3 +110,4 @@ management:
     org.springframework.cloud.loadbalancer: DEBUG
 
 
+ 

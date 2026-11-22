@@ -1,5 +1,8 @@
 package com.microservices.gateway.filter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
 import com.microservices.gateway.util.JwtUtil;
 
@@ -14,6 +17,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
+import com.microservices.gateway.service.AuthMetrics;
 
 import java.util.List;
 import com.microservices.gateway.util.*;
@@ -22,178 +27,291 @@ import com.microservices.gateway.util.*;
 @Slf4j
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    @Autowired
-    private com.microservices.gateway.service.NatsService natsService;
-
-    private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
-            "/api/v1/auth/verify",
-            "/api/v1/auth/mfa/verify",
-            "/api/v1/auth/verify-email",
-            "/api/v1/auth/resend-verification",
-            "/api/v1/auth/reset-password",
-            "/api/v1/auth/forgot-password",
-            "/api/v1/auth/docs",          "/api/v1/auth/docs/**",
-            "/api/v1/ec2/docs",           "/api/v1/ec2/docs/**",
-            "/api/v1/lambda/docs",        "/api/v1/lambda/docs/**",
-            "/api/v1/rds/docs",           "/api/v1/rds/docs/**",
-            "/api/v1/identity/docs",      "/api/v1/identity/docs/**",
-            "/api/v1/gamelift/docs",      "/api/v1/gamelift/docs/**",
-            "/api/v1/fargate/docs",       "/api/v1/fargate/docs/**",
-            "/api/v1/api-gateway/docs",   "/api/v1/api-gateway/docs/**",
-            "/api/v1/sagemaker/docs",     "/api/v1/sagemaker/docs/**",
-            "/api/v1/network/docs",       "/api/v1/network/docs/**",
-            "/api/v1/metrics/docs",       "/api/v1/metrics/docs/**",
-            "/api/v1/s3/docs",            "/api/v1/s3/docs/**",
-            "/api/v1/config/docs",        "/api/v1/config/docs/**",
-            "/api/v1/gateway/docs",       "/api/v1/gateway/docs/**",
-            "/api/v1/billing/docs",       "/api/v1/billing/docs/**"
-    );
+	
+	
+	@Autowired
+	 private   AuthMetrics authMetrics;
 
 
-@Override
-public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-    String path = exchange.getRequest().getURI().getPath();
+	@Autowired
+	private com.microservices.gateway.service.NatsService natsService;
 
-    // 1. Public endpoints — no auth
-    if (isPublicEndpoint(path)) {
-        return chain.filter(exchange);
-    }
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    String credential = null;
-    String authMethod = null;
+	private static final List<String> PUBLIC_ENDPOINTS = List.of(
 
-    // 2. Try Authorization: Bearer <token>
-    String authHeader = exchange.getRequest()
-            .getHeaders()
-            .getFirst(HttpHeaders.AUTHORIZATION);
+			"/api/v1/llm/health/**", "/api/v1/llm/health",
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        credential = authHeader.substring(7).trim();
-        authMethod = "jwt";
-    }
+			"/api/v1/gamelift/health/**", "/api/v1/gamelift/health",
 
-    // 3. Fallback to ?token=
-    if (credential == null || credential.isBlank()) {
-        String queryToken = exchange.getRequest()
-                .getQueryParams()
-                .getFirst("token");
+			"/api/v1/auth/health",
+			"/api/v1/gateway/health",
+			"/api/v1/s3/health",
+			"/api/v1/ec2/health",
+			"/api/v1/rds/health", "/api/v1/rds/health/**",
+			"/api/v1/lambda/health",
+			"/api/v1/sagemaker/health",
 
-        if (queryToken != null && !queryToken.isBlank()) {
-            credential = queryToken.trim();
-            authMethod = "query";
-        }
-    }
+			"/api/v1/auth/login",
+			"/api/v1/auth/register",
+			"/api/v1/auth/verify",
+			"/api/v1/auth/mfa/verify",
+			"/api/v1/auth/verify-email",
+			"/api/v1/auth/resend-verification",
+			"/api/v1/auth/reset-password",
+			"/api/v1/auth/forgot-password");
 
-    // 4. Fallback to X-Api-Key
-    if (credential == null || credential.isBlank()) {
-        String apiKey = exchange.getRequest()
-                .getHeaders()
-                .getFirst("X-Api-Key");
+	private static final List<String> DOCS_ENDPOINTS = List.of(
+			"/api/v1/llm/docs/**", "/api/v1/llm/docs",
+			"/api/v1/gamelift/docs", "/api/v1/gamelift/docs/**",
+			"/api/v1/ec2/docs", "/api/v1/ec2/docs/**",
+			"/api/v1/lambda/docs", "/api/v1/lambda/docs/**",
+			"/api/v1/rds/docs", "/api/v1/rds/docs/**",
+			"/api/v1/identity/docs", "/api/v1/identity/docs/**",
+			"/api/v1/fargate/docs", "/api/v1/fargate/docs/**",
+			"/api/v1/gateway/docs", "/api/v1/gateway/docs/**",
+			"/api/v1/sagemaker/docs", "/api/v1/sagemaker/docs/**",
+			"/api/v1/network/docs", "/api/v1/network/docs/**",
+			"/api/v1/metrics/docs", "/api/v1/metrics/docs/**",
+			"/api/v1/s3/docs", "/api/v1/s3/docs/**",
+			"/api/v1/config/docs", "/api/v1/config/docs/**",
+			"/api/v1/billing/docs", "/api/v1/billing/docs/**",
+			"/api/v1/auth/docs", "/api/v1/auth/docs/**");
 
-        if (apiKey != null && !apiKey.isBlank()) {
-            credential = apiKey.trim();
-            authMethod = "api-key";
-        }
-    }
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+		String path = exchange.getRequest().getURI().getPath();
+		String requestId = UUID.randomUUID().toString();
+		String userId = "x";
+		String authMethod = "None";
+		String role;
+		System.out.println("AT the top of the filter method");
 
-    // 5. No credentials found
-    if (credential == null || credential.isBlank()) {
-        return failAuth(exchange, path, "MISSING_CREDENTIALS");
-    }
+		// 1. Public endpoints — no auth
+		// TODO: this is glue code,it should be removed
+		// the issue is, since the docs comefrom the backend, and each backend has the
+		// auth
+		// middleware that need several haedersuserId, requestId, role, authMethod,
+		// but since docs endpoints can be reached with a authentication, the middleware
+		// in each microservice blocks the reques,
+		// so we do somehting dangerous
 
-    String userId = null;
-    String role   = null;
-
-    // 6. Validate based on auth method
-    switch (authMethod) {
-
-        case "jwt":
-        case "query":
-
-            if (!jwtUtil.isTokenValid(credential)) {
-                return failAuth(exchange, path, "JWT_SIGNATURE");
-            }
-
-            userId = jwtUtil.extractUserId(credential);
-            role   = jwtUtil.extractRole(credential);
-
-            break;
-
-        case "api-key":
-
-   
-            // Replace with your actual validation logic
-            if (!jwtUtil.isApiKeyValid(credential)) {
-                return failAuth(exchange, path, "INVALID_API_KEY");
-            }
-
-            // Optional machine identity
-            userId = "agent";
-            role   = "SYSTEM";
-
-            break;
-
-        default:
-            return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
-    }
-
-    log.info(
-            "[auth] userId={} role={} method={} path={}",
-            userId,
-            role,
-            authMethod,
-            path
-    );
-
-    // 7. Forward auth context downstream
-    ServerHttpRequest mutatedRequest = exchange.getRequest()
-            .mutate()
-            .header("X-Auth-Method", authMethod)
-            .header("X-User-Id", userId != null ? userId : "")
-            .header("X-User-Role", role != null ? role : "")
-            .build();
-
-    return chain.filter(
-            exchange.mutate()
-                    .request(mutatedRequest)
-                    .build()
-    );
-}
+		if (isPublicEndpoint(path)) {
+			System.out.println("*checking if is public endpoint");
+			    authMetrics.record("public", "success", "none");
 
 
-    private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
-        String clientIp = "unknown";
-        if (exchange.getRequest().getRemoteAddress() != null
-                && exchange.getRequest().getRemoteAddress().getAddress() != null) {
-            clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
-        }
+			ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("X-Auth-Method", "None")
+					.header("X-User-Role", "USER").header("X-User-Id", "xx")
+					.header("X-Request-Id", "public-req-" + requestId)
 
-        log.warn("Auth failed: {} | ,,path: {} | ip: {}", type, path, clientIp);
+					.build();
 
-        natsService.publish("auth", "failure", java.util.Map.of(
-                "type",      type,
-                "path",      path,
-                "ip",        clientIp,
-                "timestamp", java.time.LocalDateTime.now().toString()));
+			return chain.filter(exchange.mutate().request(mutatedRequest).build());
+		}
 
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        return exchange.getResponse().setComplete();
-    }
+		if (isDocsEndpoint(path)) {
+    authMetrics.record("docs", "success", "none");   // see note below
+    return handleDocsAuth(exchange, chain, path, requestId);
+		}
 
-    private boolean isPublicEndpoint(String path) {
-        return PUBLIC_ENDPOINTS.stream()
-                .anyMatch(pattern -> pathMatcher.match(pattern, path));
-    }
+		String credential = null;
+		// 2. Try Authorization: Bearer <token>
+		String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-    @Override
-    public int getOrder() {
-        return -1;
-    }
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			credential = authHeader.substring(7).trim();
+			authMethod = "jwt";
+		}
+		// TODO: number 4 is above number 3 because the query authenticatorisnt working
+		// properly,for now we put the apikey
+		// 4. Fallback to X-Api-Key
+		if (credential == null || credential.isBlank()) {
+			String apiKey = exchange.getRequest().getHeaders().getFirst("X-Api-Key");
+
+			if (apiKey != null && !apiKey.isBlank()) {
+				credential = apiKey.trim();
+				authMethod = "api-key";
+			}
+		}
+
+		// 3. Fallback to ?token=
+		if (credential == null || credential.isBlank()) {
+			String queryToken = exchange.getRequest().getQueryParams().getFirst("token");
+			if (queryToken != null && !queryToken.isBlank()) {
+				credential = queryToken.trim();
+				authMethod = "query";
+			}
+		}
+
+		// 5. No credentials found
+		if (credential == null || credential.isBlank()) {
+			  authMetrics.record("none", "failure", "MISSING_CREDENTIALS");
+    return failAuth(exchange, path, "MISSING_CREDENTIALS");
+		}
+
+		// 6. Validate based on auth method
+
+		switch (authMethod) {
+
+			case "jwt":
+			case "query":
+
+				if (!jwtUtil.isTokenValid(credential)) {
+					  authMetrics.record(authMethod, "failure", "JWT_SIGNATURE");
+					return failAuth(exchange, path, "JWT_SIGNATURE");
+				}
+
+				userId = jwtUtil.extractUserId(credential);
+				role = jwtUtil.extractRole(credential);
+
+				System.out.println("====> uwthMethod: " + userId + " Url: " + role);
+
+				break;
+
+			case "api-key":
+
+				// Replace with your actual validation logic
+				if (!jwtUtil.isApiKeyValid(credential)) {
+					        authMetrics.record(authMethod, "failure", "INVALID_API_KEY");
+					return failAuth(exchange, path, "INVALID_API_KEY");
+				}
+
+				userId = jwtUtil.extractUserIdFromApiKey(credential);
+				role = "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM"
+						: jwtUtil.getUserRole(credential);
+				break;
+
+			default:
+				return failAuth(exchange, path, "UNKNOWN_AUTH_METHOD");
+		}
+authMetrics.record(authMethod, "success", "none");
+		log.info("[auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
+
+		// 7. Forward auth context downstream
+		ServerHttpRequest mutatedRequest = exchange.getRequest().mutate().header("X-Auth-Method", authMethod)
+				.header("X-Authorization", credential).header("X-User-Id", userId != null ? userId : "")
+				.header("X-User-Role", role != null ? role : "").header("X-Request-Id", requestId)
+
+				.build();
+
+		return chain.filter(
+
+				exchange.mutate().request(mutatedRequest).build()
+
+		);
+	}
+
+	private boolean isDocsEndpoint(String path) {
+		System.out.println("*checking if is docs endpoint");
+		return DOCS_ENDPOINTS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+	}
+
+	private Mono<Void> handleDocsAuth(ServerWebExchange exchange, GatewayFilterChain chain, String path,
+			String requestId) {
+		String credential = null;
+		String authMethod = "None";
+
+		String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			credential = authHeader.substring(7).trim();
+			authMethod = "jwt";
+		}
+
+		if (credential == null || credential.isBlank()) {
+			String apiKey = exchange.getRequest().getHeaders().getFirst("X-Api-Key");
+			if (apiKey != null && !apiKey.isBlank()) {
+				credential = apiKey.trim();
+				authMethod = "api-key";
+			}
+		}
+
+		if (credential == null || credential.isBlank()) {
+			String queryToken = exchange.getRequest().getQueryParams().getFirst("token");
+			if (queryToken != null && !queryToken.isBlank()) {
+				credential = queryToken.trim();
+				authMethod = "query";
+			}
+		}
+
+		String userId = "xx";
+		String role = "USER";
+
+		if (credential != null && !credential.isBlank()) {
+			try {
+				switch (authMethod) {
+					case "jwt":
+					case "query":
+						if (jwtUtil.isTokenValid(credential)) {
+							userId = jwtUtil.extractUserId(credential);
+							role = jwtUtil.extractRole(credential);
+						} else {
+							log.info("[docs-auth] invalid/expired token on {}, falling back to anonymous", path);
+						}
+						break;
+
+					case "api-key":
+						if (jwtUtil.isApiKeyValid(credential)) {
+							userId = jwtUtil.extractUserIdFromApiKey(credential);
+							role = "00000000-0000-0000-0000-000000000000".equals(userId) ? "SYSTEM"
+									: jwtUtil.getUserRole(credential);
+						} else {
+							log.info("[docs-auth] invalid api key on {}, falling back to anonymous", path);
+						}
+						break;
+				}
+			} catch (Exception e) {
+				// Any validation error on a docs route degrades to anonymous
+				// rather than failing the request.
+				log.warn("[docs-auth] error validating credential on {}: {}", path, e.getMessage());
+				userId = "xx";
+				role = "USER";
+			}
+		}
+
+		if (role == null || role.isBlank()) {
+			role = "USER";
+		}
+
+		log.info("[docs-auth] userId={} role={} method={} path={}", userId, role, authMethod, path);
+
+		ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+				.header("X-Auth-Method", authMethod)
+				.header("X-User-Id", userId)
+				.header("X-User-Role", role)
+				.header("X-User-Role", role)
+				.header("X-Request-Id", requestId)
+				.build();
+
+		return chain.filter(exchange.mutate().request(mutatedRequest).build());
+	}
+
+	private Mono<Void> failAuth(ServerWebExchange exchange, String path, String type) {
+		String clientIp = "unknown";
+		if (exchange.getRequest().getRemoteAddress() != null
+				&& exchange.getRequest().getRemoteAddress().getAddress() != null) {
+			clientIp = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
+		}
+
+		log.warn("Auth failed: {} | ,,path: {} | ip: {}", type, path, clientIp);
+
+		natsService.publish("auth", "failure", java.util.Map.of("type", type, "path", path, "ip", clientIp, "timestamp",
+				java.time.LocalDateTime.now().toString()));
+
+		exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+		return exchange.getResponse().setComplete();
+	}
+
+	private boolean isPublicEndpoint(String path) {
+
+		return PUBLIC_ENDPOINTS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+	}
+
+	@Override
+	public int getOrder() {
+		return -1;
+	}
 }
